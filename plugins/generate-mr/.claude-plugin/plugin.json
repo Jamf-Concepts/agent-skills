@@ -1,0 +1,11 @@
+{
+  "name": "generate-mr",
+  "version": "v1.0.0",
+  "description": "Generate, write, and edit IDHub MR Language (Mapping Rule DSL) code for the IDHub Provisioning Pipeline (PVP): ingestion, policy, publication, and correlation rules, plus PVP log triage for pipeline run failures.",
+  "author": {
+    "name": "Jesse Hall",
+    "email": "jesse.hall@jamf.com"
+  },
+  "keywords": ["rapidIdentity", "idhub", "mr", "mapping rule", "pvp", "rapidid"],
+  "repository": "https://github.com/Jamf-Concepts/agent-skills/tree/main/plugins/generate-mr"
+}

@@ -27,3 +27,8 @@ out/
 *.a
 *.dylib
 *.so
+
+# Skill authoring artifacts (rapididentity-skills)
+archive/
+scripts/build.ps1
+__pycache__/
