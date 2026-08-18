@@ -1,12 +1,11 @@
 {
-  "name": "jamf-identity-plugins",
+  "name": "jamf-agent-skills",
   "owner": {
-    "name": "Jesse Hall",
-    "email": "jesse.hall@jamf.com"
+    "name": "Jamf"
   },
   "metadata": {
-    "description": "Plugins for Jamf Identity products (RapidIdentity): Connect action sets, portal workflows and entitlements, and IDHub MR Language.",
-    "version": "1.5.0",
+    "description": "Plugins for Jamf products",
+    "version": "1.0.0",
     "pluginRoot": "./plugins"
   },
   "plugins": [
