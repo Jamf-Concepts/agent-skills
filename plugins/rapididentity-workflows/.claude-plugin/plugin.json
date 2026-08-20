@@ -1,0 +1,11 @@
+{
+  "name": "rapididentity-workflows",
+  "version": "v1.2.0",
+  "description": "Author, edit, import, configure, and troubleshoot RapidIdentity portal workflows and their JSON definitions: action nodes (DSS, approval, condition, email), %{} variable substitution, valuePairs wiring to Connect action sets, workflow forms, approver types, on-behalf-of requests, and entitlement creation. Field names verified against live tenant captures and the rapididentity-server source.",
+  "author": {
+    "name": "Jesse Hall",
+    "email": "jesse.hall@jamf.com"
+  },
+  "keywords": ["rapidIdentity", "workflows", "requests", "entitlements", "rapidid", "approval"],
+  "repository": "https://github.com/Jamf-Concepts/agent-skills/tree/main/plugins/rapididentity-workflows"
+}
