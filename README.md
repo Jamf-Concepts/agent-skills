@@ -18,15 +18,21 @@ A collection of Claude Code plugins — packaged agent skills for working with t
 
 ## Installation
 
-Install the full skill collection as a Claude Code plugin:
+**Step 1 — Add this repository as a marketplace:**
 
 ```bash
-claude plugin install Jamf-Concepts/agent-skills
+claude plugin marketplace add https://github.com/Jamf-Concepts/agent-skills.git
 ```
 
-Or reference a specific plugin directory when installing individually.
+**Step 2 — Install the skill(s) you want:**
 
-Once installed, invoke skills from within Claude Code using their slash-command names (e.g. `/rapididentity-workflows`, `/connect-action-sets`, `/generate-mr`). See each plugin's directory for full usage details.
+```bash
+claude plugin install connect-action-sets@jamf-agent-skills
+claude plugin install rapididentity-workflows@jamf-agent-skills
+claude plugin install generate-mr@jamf-agent-skills
+```
+
+Once installed, invoke a skill from within Claude Code using its slash-command name (e.g. `/rapididentity-workflows`). See each plugin's directory for full usage details.
 
 ## Contributing
 
