@@ -2,11 +2,7 @@
 
 ## About
 
-This repository is a growing library of [Claude Code](https://claude.ai/code) plugins — packaged agent skills that extend Claude's capabilities for working with Jamf platform products and partner integrations.
-
-Today it ships with a set of skills for RapidIdentity, authored by the Jamf CE team. The vision is broader: as the Jamf platform expands and the CE and engineering communities build out skills for Jamf Pro, Jamf Connect, Jamf Protect, Jamf School, and ecosystem integrations, this is where they live and are shared publicly with the community.
-
-If your team works with a Jamf platform product and has built skills worth sharing, contributions are welcome.
+A collection of Claude Code plugins — packaged agent skills for working with the Jamf Platform.
 
 ## Available Skills
 
@@ -34,11 +30,9 @@ Once installed, invoke skills from within Claude Code using their slash-command 
 
 ## Contributing
 
-Have skills for another Jamf platform product? Contributions are welcome.
+Have skills for a Jamf Platform product? Contributions are welcome.
 
-Each plugin lives in `plugins/<plugin-name>/` and follows the `.claude-plugin` structure. Use the existing plugins as reference implementations, then open a PR against the `develop` branch. See [CLAUDE.md](CLAUDE.md) for branch conventions.
-
-Planned areas for future skills include Jamf Pro API workflows, Jamf Connect configuration, Jamf Protect policy authoring, and Jamf School automation — but any Jamf platform product is fair game.
+Each plugin lives in `plugins/<plugin-name>/` and follows the `.claude-plugin` structure. Use the existing plugins as reference implementations, then open a PR against the `develop` branch — and update the Available Skills table above as part of that PR. See [CLAUDE.md](CLAUDE.md) for branch conventions.
 
 ## License
 
