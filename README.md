@@ -1,7 +1,5 @@
 # Jamf Platform Agent Skills
 
-> A community collection of Claude Code agent skills for the Jamf platform ecosystem.
-
 ## About
 
 This repository is a growing library of [Claude Code](https://claude.ai/code) plugins — packaged agent skills that extend Claude's capabilities for working with Jamf platform products and partner integrations.
