@@ -1,8 +1,3 @@
-![GitHub issues](https://img.shields.io/github/issues-raw/Jamf-Concepts/agent-skills)
-![GitHub closed issues](https://img.shields.io/github/issues-closed-raw/Jamf-Concepts/agent-skills)
-![GitHub pull requests](https://img.shields.io/github/issues-pr-raw/Jamf-Concepts/agent-skills)
-![GitHub closed pull requests](https://img.shields.io/github/issues-pr-closed-raw/Jamf-Concepts/agent-skills)
-
 # Jamf Platform Agent Skills
 
 > A community collection of Claude Code agent skills for the Jamf platform ecosystem.
