@@ -1,39 +1,46 @@
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/Jamf-Concepts/<repo_name>?display_name=tag)
-![GitHub all releases](https://img.shields.io/github/downloads/Jamf-Concepts/<repo_name>/total)
-![GitHub issues](https://img.shields.io/github/issues-raw/Jamf-Concepts/<repo_name>)
-![GitHub closed issues](https://img.shields.io/github/issues-closed-raw/Jamf-Concepts/<repo_name>)
-![GitHub pull requests](https://img.shields.io/github/issues-pr-raw/Jamf-Concepts/<repo_name>)
-![GitHub closed pull requests](https://img.shields.io/github/issues-pr-closed-raw/Jamf-Concepts/<repo_name>)
-
-# \<repo_name\>
-
-> One-line description of what this does.
+# Jamf Platform Agent Skills
 
 ## About
 
-<!-- What problem does this solve? Who is it for? -->
+A collection of Claude Code plugins — packaged agent skills for working with the Jamf Platform.
+
+## Available Skills
+
+| Plugin | Product Area | Description |
+|--------|-------------|-------------|
+| [`connect-action-sets`](plugins/connect-action-sets/) | RapidIdentity | Author, review, and refactor RapidIdentity Connect action sets in XML — conventions, logging patterns, JavaScript semantics, and platform best practices. |
+| [`rapididentity-workflows`](plugins/rapididentity-workflows/) | RapidIdentity | Author, configure, and troubleshoot RapidIdentity portal workflows and their JSON definitions: action nodes, `%{}` variables, valuePairs wiring, workflow forms, approver types, and entitlement creation. |
+| [`generate-mr`](plugins/generate-mr/) | RapidIdentity / IDHub | Generate and edit IDHub MR Language (Mapping Rule DSL) code for the IDHub Provisioning Pipeline: ingestion, policy, publication, correlation rules, and PVP log triage. |
 
 ## Requirements
 
-<!-- List prerequisites: OS version, runtime, dependencies, etc. -->
+- [Claude Code](https://claude.ai/code) (latest)
 
 ## Installation
 
-```
-<!-- Installation steps -->
+**Step 1 — Add this repository as a marketplace:**
+
+```bash
+claude plugin marketplace add https://github.com/Jamf-Concepts/agent-skills.git
 ```
 
-## Usage
+**Step 2 — Install the skill(s) you want:**
 
+```bash
+claude plugin install connect-action-sets@jamf-agent-skills
+claude plugin install rapididentity-workflows@jamf-agent-skills
+claude plugin install generate-mr@jamf-agent-skills
 ```
-<!-- Basic usage example -->
-```
+
+Once installed, invoke a skill from within Claude Code using its slash-command name (e.g. `/rapididentity-workflows`). See each plugin's directory for full usage details.
 
 ## Contributing
 
-Open a PR against the `develop` branch. See [CLAUDE.md](CLAUDE.md) for branch and org conventions.
+Have skills for a Jamf Platform product? Contributions are welcome.
+
+Each plugin lives in `plugins/<plugin-name>/` and follows the `.claude-plugin` structure. Use the existing plugins as reference implementations, then open a PR against the `develop` branch — and update the Available Skills table above as part of that PR. See [CLAUDE.md](CLAUDE.md) for branch conventions.
 
 ## License
 
-Copyright 2024, Jamf Software, LLC.
+Copyright 2024, Jamf Software, LLC.  
 Offered under the terms of the [Jamf Concepts Use Agreement](https://resources.jamf.com/documents/jamf-concept-projects-use-agreement.pdf).
