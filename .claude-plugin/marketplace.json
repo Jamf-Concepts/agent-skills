@@ -1,0 +1,43 @@
+{
+  "name": "jamf-agent-skills",
+  "owner": {
+    "name": "Jamf"
+  },
+  "metadata": {
+    "description": "Plugins for Jamf products",
+    "version": "1.0.0",
+    "pluginRoot": "./plugins"
+  },
+  "plugins": [
+    {
+      "name": "connect-action-sets",
+      "description": "A comprehensive guide for authoring, reviewing, and refactoring RapidIdentity Connect action sets in XML. Covers conventions, coding standards, logging patterns, JavaScript semantics, and platform best practices for building identity workflows.",
+      "author": {
+        "name": "Jesse Hall",
+        "email": "jesse.hall@jamf.com"
+      },
+      "category": "rapidid",
+      "source": "./plugins/connect-action-sets"
+    },
+    {
+      "name": "rapididentity-workflows",
+      "description": "Author, configure, and troubleshoot RapidIdentity portal workflows and their JSON definitions: action nodes, %{} variables, valuePairs wiring to Connect action sets, workflow forms, approver types, on-behalf-of requests, and entitlement creation.",
+      "author": {
+        "name": "Jesse Hall",
+        "email": "jesse.hall@jamf.com"
+      },
+      "category": "rapidid",
+      "source": "./plugins/rapididentity-workflows"
+    },
+    {
+      "name": "generate-mr",
+      "description": "Generate and edit IDHub MR Language (Mapping Rule DSL) code for the IDHub Provisioning Pipeline: ingestion, policy, publication, and correlation rules, plus PVP log triage.",
+      "author": {
+        "name": "Jesse Hall",
+        "email": "jesse.hall@jamf.com"
+      },
+      "category": "rapidid",
+      "source": "./plugins/generate-mr"
+    }
+  ]
+}
