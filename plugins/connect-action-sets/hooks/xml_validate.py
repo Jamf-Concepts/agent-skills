@@ -1,3 +1,4 @@
+# Copyright 2024, Jamf Software LLC
 """PostToolUse hook on Edit|Write.
 
 After any edit to an .xml file, re-parse it. If the file is no longer

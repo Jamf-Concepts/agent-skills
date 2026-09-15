@@ -1,3 +1,4 @@
+# Copyright 2024, Jamf Software LLC
 """PreToolUse hook on Read.
 
 Three behaviors for XML files:

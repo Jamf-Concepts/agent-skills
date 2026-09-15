@@ -80,7 +80,23 @@ A plugin's skills are namespaced by the plugin carrying them, so invoke one as `
 
 </details>
 
+## Getting Help
+
+Open an issue at <https://github.com/Jamf-Concepts/agent-skills/issues> or ask in [#team-jamf-concepts-developers](https://jamf.slack.com/archives/team-jamf-concepts-developers) on Slack.
+
+## Troubleshooting
+
+**Skill not invoked:** Confirm the skill directory is in `~/.claude/skills/<skill-name>/` and contains a `SKILL.md`. Restart Claude Code.
+
+**Plugin not found after install:** Run `claude plugin list` to verify the plugin installed correctly. Re-run `claude plugin install <plugin-name>@jamf-agent-skills` if needed.
+
+**Hook not firing:** Check that the hooks in `plugins/<plugin-name>/hooks/` are executable and that `hooks.json` correctly references each hook file. Review Claude Code output for Python errors if a hook exits unexpectedly.
+
+**XML validation errors from `xml_validate.py`:** The hook validates well-formedness after every XML edit. The error message includes the parse error — correct the XML before continuing.
+
 ## License
 
 Copyright 2024, Jamf Software, LLC.  
-Offered under the terms of the [Jamf Concepts Use Agreement](https://resources.jamf.com/documents/jamf-concept-projects-use-agreement.pdf).
+Released under the [MIT License](LICENSE.md).
+
+For information on how Jamf handles personal data, see the [Jamf Privacy Policy](https://jamf.com/privacy).

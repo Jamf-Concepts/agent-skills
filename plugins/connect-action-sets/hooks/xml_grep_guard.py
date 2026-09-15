@@ -1,3 +1,4 @@
+# Copyright 2024, Jamf Software LLC
 """PreToolUse hook on Grep.
 
 A content-mode Grep against a minified/single-line XML file returns the entire
