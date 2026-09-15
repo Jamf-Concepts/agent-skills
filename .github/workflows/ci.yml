@@ -21,5 +21,5 @@ jobs:
 
       - name: Python lint
         run: |
-          pip install ruff --quiet
+          pip install ruff==0.16.7 --quiet
           ruff check plugins/
