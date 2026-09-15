@@ -13,7 +13,7 @@ jobs:
       - name: Validate JSON
         run: |
           find . -name "*.json" -not -path "*/.git/*" \
-            | xargs python3 -m json.tool --no-indent > /dev/null
+            | xargs -I {} python3 -m json.tool {} > /dev/null
 
       - uses: actions/setup-python@v5
         with:
