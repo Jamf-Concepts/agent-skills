@@ -330,10 +330,10 @@ echo "Deleted $DELETED, not found $MISSING, failed $FAILED"
 
 ### Report
 
-**Scope level and headers.** Platform environment scope. Every gateway call carries
+**Set up the integration.** Platform environment scope. Every gateway call carries
 `X-Environment-Id`; the token mint carries no scope header.
 
-**Capability grants.**
+The grants:
 
 | Grant | Picker | Needed by |
 | --- | --- | --- |
@@ -344,6 +344,14 @@ echo "Deleted $DELETED, not found $MISSING, failed $FAILED"
 `devices:read` covers the read on both products and is one grant. The two deletes take two
 different grants: no REST device-record deletion uses `devices:delete`, and `devices:delete` exists
 only on the Protect mutation.
+
+- Mint an environment-scoped integration in Jamf Account with the three grants above. Note the
+  environment ID from its details panel.
+- Import the secret once:
+  `security add-generic-password -U -s "Jamf Platform API Integration" -a "{client-id}" -w '{client-secret}' -T /usr/bin/security ~/Library/Keychains/login.keychain-db`.
+  If this integration ever gets re-minted with a new client ID, delete the old item by service and
+  account first; `-U` does not replace an item whose account differs, and the lookup then returns
+  whichever it finds first.
 
 **Changes.**
 
@@ -383,17 +391,6 @@ only on the Protect mutation.
 **Recommendations.** `curl -sf` on the lookups discards the error body, so a `403` from a wrong
 route or a missing grant prints only "lookup failed". Both originals had this and it was left. To
 see the body: replace `-sf` with `-sS` and test `.totalCount` before `.errors`.
-
-**Out-of-script changes.**
-
-- Mint an environment-scoped integration in Jamf Account with the three grants above. Note the
-  environment ID from its details panel.
-- Import the secret once:
-  `security add-generic-password -U -s "Jamf Platform API Integration" -a "{client-id}" -w '{client-secret}' -T /usr/bin/security ~/Library/Keychains/login.keychain-db`.
-  If this integration ever gets re-minted with a new client ID, delete the old item by service and
-  account first; `-U` does not replace an item whose account differs, and the lookup then returns
-  whichever it finds first.
-- Rotate nothing. Neither input held a literal secret.
 
 ## 2. Classic API: update a mobile device's user by serial
 
@@ -456,9 +453,9 @@ echo "Assigned $user to device $id ($JSS/mobileDevices.html?id=$id)"
 
 ### Report
 
-**Scope level and headers.** Tenant scope, as requested. Every gateway call carries `X-Tenant-Id`.
+**Set up the integration.** Tenant scope, as requested. Every gateway call carries `X-Tenant-Id`.
 
-**Capability grants.**
+The grants:
 
 | Grant | Picker | Needed by |
 | --- | --- | --- |
@@ -467,6 +464,9 @@ echo "Assigned $user to device $id ($JSS/mobileDevices.html?id=$id)"
 | `users:update` | Inventory › Users | `PUT /proclassic/mobiledevices/id/{id}` |
 
 The Classic mobile-device update publishes two capabilities. Both are required.
+
+- Mint a tenant-scoped integration with the three grants and note the
+  tenant ID. Import the secret with `security add-generic-password -U -s "Jamf Platform API Integration" -a "{client-id}" -w '{client-secret}' -T /usr/bin/security ~/Library/Keychains/login.keychain-db`.
 
 **Changes.**
 
@@ -493,9 +493,6 @@ The Classic mobile-device update publishes two capabilities. Both are required.
 between the two calls, or a `403` from a missing grant prints "Assigned". Unchanged from the
 original. Classic error bodies are HTML, so if a check is added, test `%{http_code}` rather than
 parsing the body as JSON.
-
-**Out-of-script changes.** Mint a tenant-scoped integration with the three grants and note the
-tenant ID. Import the secret with `security add-generic-password -U -s "Jamf Platform API Integration" -a "{client-id}" -w '{client-secret}' -T /usr/bin/security ~/Library/Keychains/login.keychain-db`.
 
 ## 3. Jamf Protect: list open alerts
 
@@ -571,10 +568,10 @@ for a in r.json()["data"]["listAlerts"]["items"]:
 
 ### Report
 
-**Scope level and headers.** Platform environment scope. The one gateway call carries
+**Set up the integration.** Platform environment scope. The one gateway call carries
 `X-Environment-Id`; the token mint carries no scope header.
 
-**Capability grants.**
+The grants:
 
 | Grant | Picker | Needed by |
 | --- | --- | --- |
@@ -584,6 +581,12 @@ The nested `computer { hostName }` selection has no published grant of its own; 
 cover operations only. The field was left in the document. If the call returns
 `AuthorizationError` with "Operation not permitted by tenant permissions." after `threat-alerts:read`
 is granted, add `devices:read` and retest.
+
+- Mint an environment-scoped integration with `threat-alerts:read`. Note the environment ID.
+- The environment variable the caller sets is now `JAMF_CLIENT_SECRET`, holding the integration's
+  secret. Where the script runs on macOS, `security find-generic-password -s "Jamf Platform API Integration" -w`
+  populates it; anywhere else, the platform's secrets manager does. A script correct in isolation
+  that depends on the old variable name fails on the first run.
 
 **Changes.**
 
@@ -615,14 +618,6 @@ body = r.json()
 if body.get("errors"):
     raise SystemExit(body["errors"][0].get("message"))
 ```
-
-**Out-of-script changes.**
-
-- Mint an environment-scoped integration with `threat-alerts:read`. Note the environment ID.
-- The environment variable the caller sets is now `JAMF_CLIENT_SECRET`, holding the integration's
-  secret. Where the script runs on macOS, `security find-generic-password -s "Jamf Platform API Integration" -w`
-  populates it; anywhere else, the platform's secrets manager does. A script correct in isolation
-  that depends on the old variable name fails on the first run.
 
 ## 4. A Go program on a beta-era Jamf Platform Go SDK
 
@@ -715,14 +710,24 @@ func main() {
 
 ### Report
 
-**Scope level and headers.** Platform environment scope, as requested. The SDK sends
+**Set up the integration.** Platform environment scope, as requested. The SDK sends
 `X-Environment-Id` on every call and nothing on the token exchange.
 
-**Capability grants.**
+The grants:
 
 | Grant | Picker | Needed by |
 | --- | --- | --- |
 | `devices:read` | Inventory › Devices | `ListDevices`, which calls `GET /devices/v1/devices` |
+
+- Mint an environment-scoped integration in Jamf Account with `devices:read`. Note the environment
+  ID. The old tenant-scoped beta integration no longer exists; a program still carrying its values
+  returns `401 {"error":"invalid_client"}` on the first call, which is also what a wrong secret
+  returns. The Jamf Account integrations list settles which.
+- In the nightly job's environment: replace the values of `JAMFPLATFORM_CLIENT_ID` and
+  `JAMFPLATFORM_CLIENT_SECRET`, remove `JAMFPLATFORM_TENANT_ID`, and add
+  `JAMFPLATFORM_ENVIRONMENT_ID`. A job that still sets the tenant variable and not the environment
+  one starts the program with an empty scope and the gateway returns
+  `400 REQUEST_CONTEXT_NOT_PROVIDED`.
 
 **Changes.**
 
@@ -747,15 +752,3 @@ func main() {
 
 **Recommendations.** None. Token refresh and paging are the SDK's; the secret is already read from
 the environment, which is the runtime form for a Linux host.
-
-**Out-of-script changes.**
-
-- Mint an environment-scoped integration in Jamf Account with `devices:read`. Note the environment
-  ID. The old tenant-scoped beta integration no longer exists; a program still carrying its values
-  returns `401 {"error":"invalid_client"}` on the first call, which is also what a wrong secret
-  returns. The Jamf Account integrations list settles which.
-- In the nightly job's environment: replace the values of `JAMFPLATFORM_CLIENT_ID` and
-  `JAMFPLATFORM_CLIENT_SECRET`, remove `JAMFPLATFORM_TENANT_ID`, and add
-  `JAMFPLATFORM_ENVIRONMENT_ID`. A job that still sets the tenant variable and not the environment
-  one starts the program with an empty scope and the gateway returns
-  `400 REQUEST_CONTEXT_NOT_PROVIDED`.
