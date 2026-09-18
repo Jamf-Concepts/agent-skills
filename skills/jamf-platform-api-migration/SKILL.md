@@ -1,22 +1,20 @@
 ---
 name: jamf-platform-api-migration
 description: Converts a script that calls the Jamf Pro API, Jamf Pro Classic API, Jamf Protect API, or Jamf Security Cloud API directly, or a Go program on a pre-GA Jamf Platform Go SDK, into one that reaches the identical outcome over the Jamf Platform API Gateway with a single Jamf Account integration. Use when asked to migrate, convert, or move a Jamf API script, integration, curl command, or workflow to the platform API, the gateway, {region}.api.jamfcloud.com, or capability permissions, or when asked which capability grants a Jamf script needs.
-compatibility: Tested with Claude Sonnet and Claude Opus; other models are untested. Reads the script from the conversation or the filesystem, and writes the converted script to a new file wherever a filesystem is reachable. Network access to developer.jamf.com improves grant and version precision; conversion works without it from bundled rules.
+compatibility: Tested with Claude Sonnet and Claude Opus; other models are untested. Reads the script from the conversation or the filesystem, and writes the converted script and its report to new files beside the input wherever a filesystem is reachable. Network access to developer.jamf.com improves grant and version precision; conversion works without it from bundled rules.
 metadata:
-  version: "1.0.0-rc.1"
+  version: "1.0.0"
   bundled-permissions-map: "2026-09-03"
-allowed-tools: Read, Write, Grep, Glob, Bash(curl:*), Bash(dig:*), WebFetch
+allowed-tools: Read, Write, Grep, Glob, Bash(curl:*), Bash(dig:*), Bash(ls:*), Bash(chmod:*), WebFetch
 ---
 
 # Jamf Platform API migration
 
 Input: a script in any language that calls the Jamf Pro API, the Classic API, the Jamf Protect API,
 or the Jamf Security Cloud API directly against a product host. Output: the same script converted to
-call the Platform API Gateway with one integration credential, **written to a new file wherever a
-filesystem is reachable and carried in full inside a report** in the format under **Output
-contract**. Both artifacts, every time: the file is what the admin runs, the report is what they
-read. The contract is an identical outcome with the fewest edits. It is not a refactor, a cleanup, or
-a rewrite.
+call the Platform API Gateway with one integration credential, **written to a new file beside the
+input, with its report written to a second file beside it**, per the **Output contract**. The
+contract is an identical outcome with the fewest edits, not a refactor, a cleanup, or a rewrite.
 
 Reference files, all one level from here. Read the ones the script needs before converting:
 
@@ -30,12 +28,44 @@ Reference files, all one level from here. Read the ones the script needs before 
   how it reads its secret.
 - [examples.md](examples.md): worked before-and-after conversions.
 
+## Check for a newer version first
+
+An installed copy has no other way to learn that a rule changed, so on every invocation, before
+reading the script:
+
+1. Read `SKILL.md` in this skill's own directory with the Read tool and take `metadata.version`
+   from its frontmatter. That is the installed version, and the version every report names.
+2. Where a shell or a fetch tool is available, read the published frontmatter:
+   `curl -sSL --max-time 5 https://raw.githubusercontent.com/Jamf-Concepts/agent-skills/main/skills/jamf-platform-api-migration/SKILL.md | sed -n '1,12p'`.
+   Where `curl` is not available, fetch the same URL with the fetch tool.
+3. Compare the two: the installed version from step 1 against `metadata.version` in the fetched
+   copy. Compare `major.minor.patch` as numbers; on equal numbers, the version carrying a `-`
+   suffix is the older one. So `1.0.0-rc.1` is older than `1.0.0`, and an installed `1.0.0` beside
+   a published `1.0.0-rc.1` is current.
+4. Only if the published version is newer: say so in one line naming both versions, print the
+   command below, which replaces the installed copy in place (a zip upload is replaced by uploading
+   the new zip), say to start a new session after running it, and then **stop and wait**. Do nothing
+   else until the admin either updates or answers that they want to continue on the installed
+   version.
+
+   ```bash
+   mkdir -p ~/.claude/skills
+   curl -sL https://github.com/Jamf-Concepts/agent-skills/archive/refs/heads/main.tar.gz \
+     | tar -xz -C ~/.claude/skills --strip-components=2 \
+         agent-skills-main/skills/jamf-platform-api-migration
+   ```
+
+5. When the installed version is equal or newer, and whenever the fetch fails, times out, or no
+   network tool exists: print nothing, not even a note that the check ran, and continue. The check
+   never blocks a conversion, and this skill never writes to its own directory.
+
 ## Before converting
 
-Four facts decide the output. Take each from the request or the script. For any that neither
-settles, do not stop to ask: take the default given below, convert under it, and put the question in
-the report's scope section with what to change if the default is wrong. The report is the place to
-ask; the reply always carries a converted script or a stop report, never a question on its own.
+Five facts decide the output. Take each from the request or the script. For any that neither
+settles, do not stop to ask: take the default below, convert under it, and put the question in the
+report's setup section with what to change if the default is wrong. The reply always carries a
+converted script or a stop report, never a question on its own, with two exceptions only: the
+version check above and item 5 below.
 
 1. **Scope level of the integration.** Environment or tenant. It decides which one header every
    gateway call carries. Environment scope is the default: an environment-scoped integration reaches
@@ -77,6 +107,13 @@ ask; the reply always carries a converted script or a stop report, never a quest
 4. **What the script's purpose is.** The calls that carry the outcome versus the ones that are
    incidental. This shapes what the report says about a partial conversion; it does not decide
    whether to convert, which step 2 settles per call.
+5. **How many scripts, and whether they merge.** One script: convert it. Two or more with the intent
+   stated in the request, such as "into one script", "as a single script", "each on its own", or
+   "separately": do what the request says and do not ask. Two or more with no stated intent: before
+   reading anything, ask one question offering the two answers, merge into one script or convert each
+   on its own, and name merge as the default so a one-word reply is enough. Merge-or-separate is what
+   the admin wants, not a fact the scripts can settle the way region and scope can, and two runs of
+   one request have to produce the same set of files. How a merge is done is in step 4.
 
 ## Procedure
 
@@ -110,14 +147,12 @@ output, not background:
   finds first, which may be the stale one. The symptom is `invalid_client` while holding a correct
   credential. Say to delete the old item by service and account first.
 - **Where the script already resolves its secret from a non-literal store,** that store carries over
-  untouched and the runtime read is a recommendation, not an edit.
-
-The exact commands are in `runtime-behavior.md`.
+  untouched and the runtime read is a recommendation, not an edit. The exact commands are in
+  `runtime-behavior.md`.
 
 This is one step rather than a per-surface rule because authentication has no gateway equivalent
-at all. The product token endpoints are not relocated; they have no path on the gateway, so a URL
-rewrite of a token call produces a script that never obtains a token and fails on every later call,
-far from the cause. The session model is replaced, not moved.
+at all. The product token endpoints have no path on the gateway, so a URL rewrite of a token call
+produces a script that never obtains a token and fails on every later call, far from the cause.
 
 - Where a script's authentication is already this form, leave it alone: a gateway token exchange,
   its `.access_token` parse, and its `Bearer` header need no change. Applying "convert the auth"
@@ -152,13 +187,11 @@ and a path taking a UUID does not serve a script holding an integer ID.
 Resolution runs per call, not per script. One script's calls can land on different branches, such as
 a Classic read with no gateway route moving to the Pro surface while its Classic write stays on
 `proclassic`. Deciding "this is a Classic script" once and applying it file-wide gets calls wrong.
+Resolve against the operation list, never against documentation prose: a keyword match in an
+endpoint's description is not an endpoint, and a description can name a term only to exclude it.
 
-Resolve against the operation list, never against documentation prose. A keyword match in an
-endpoint's description is not an endpoint; a description can name a term only to exclude it.
-
-Beta-era paths were not uniformly shaped. One call in a script can carry a `/tenant/{id}/` segment
-while another does not, so a single substitution pass reaches the right answer for the wrong reason
-and misses a segment sitting where the pattern did not expect it. Resolve each call.
+Beta-era paths were not uniformly shaped: one call can carry a `/tenant/{id}/` segment while the
+next does not, so resolve each call rather than running one substitution pass over the file.
 
 **SDK-built programs.** A Go program that imports `github.com/Jamf-Concepts/jamfplatform-go-sdk`
 makes no HTTP calls of its own, so there are no URLs to resolve. Its routes are the SDK's method
@@ -189,7 +222,6 @@ call.
 Name every such change. Check the target version's schema before rewriting a parse; a version bump
 is not a licence to re-derive it. Where a successor keeps the same envelope, the existing parsing
 stays exactly as written.
-
 Steps 2 and 4 pull against each other and the tie-break is fixed. Where a resolved route or version
 changes the response shape, step 2 wins and step 3 names the edit. Everywhere else step 4 wins.
 
@@ -217,11 +249,8 @@ only the calls change.
   and `jssAddress`, a new variable is `jss`-prefixed; beside `jamfpro_url`, it is `jamfpro_region`,
   not `jamf_region`. A variable whose every use is an API call is repointed in place under its own
   name, never replaced by a new one.
-- **Commented-out code is code and stays.** The output contract's rule about correcting a comment
-  block the conversion made wrong covers prose describing setup, privileges, or URLs. A commented-out
-  line of code is left where it is.
-- **Trailing whitespace may not survive the editing tools.** Where it does not, say so in the report
-  rather than claiming the diff is confined to the calls.
+- **Commented-out code is code and stays.** The rule about correcting a comment block the
+  conversion made wrong covers prose; a commented-out line of code is left where it is.
 - **A user-facing string the conversion made wrong or incomplete is corrected and named.** A
   beta-era token-failure message that says "check the client ID and secret" is no longer the first
   thing to check once GA has deleted every beta client: the first cause of `invalid_client` is now a
@@ -248,17 +277,15 @@ you move it."
 
 The reason, which is what makes every workaround visibly a workaround: there is no device-side
 platform API authentication. A Mac cannot authenticate to the platform API as itself at this time.
-Until it exists, a credential
-in an on-device script is therefore shared across every Mac in scope, and the platform secret that
-would replace it reaches every tenant at the integration's scope level, in a payload readable in the
-Jamf Pro admin console and written to disk fleet-wide. The blast radius goes up. The detection
-signals, why every on-endpoint credential store is a relocation rather than a fix, and the
-alternatives are in `conversion-rules.md`.
+Until it exists, a credential in an on-device script is therefore shared across every Mac in scope,
+and the platform secret that would replace it reaches every tenant at the integration's scope
+level, in a payload readable in the Jamf Pro admin console and written to disk fleet-wide. The
+blast radius goes up. The detection signals, why every on-endpoint credential store is a relocation
+rather than a fix, and the alternatives are in `conversion-rules.md`.
 
 An embedded credential on its own never stops anything. A username and password are replaced by a
 client ID and secret in the course of any conversion, so an empty, unfilled, or obviously fake
-value raises nothing at all. A value that would still authenticate is reported and rotated, never
-refused, and never reproduced in the output. The same script with an empty credential still does
+value raises nothing at all. A value that would still authenticate is reported, never refused, and never reproduced in the output. The same script with an empty credential still does
 not convert when Jamf Pro deploys it; a stop that rests on the secret being populated will convert
 the next policy script whose variable is blank.
 
@@ -275,87 +302,108 @@ The rules in these files are a sample of what scripts contain, not a census. A r
 present a surface, an auth shape, a parsing chain, or a response format no rule names, and that is
 the normal case. Resolve it from the published surface on developer.jamf.com, using the lookup in
 `capability-grants.md` and `conversion-rules.md`, rather than pattern-matching the nearest
-plausible rule. Then report the divergence: what the script presented, what the conversion
-concluded, and what it concluded it from. A confident guess in the same voice as a documented rule
-is the failure this exists to prevent, because an admin cannot tell the two apart in the output.
-
-Where the network is unavailable, say which conclusions rest on bundled rules alone and which
-would have been verified live.
+plausible rule, and report the divergence: what the script presented, what was concluded, and from
+what. A confident guess in the voice of a documented rule is the failure this exists to prevent.
+Where the network is unavailable, say which conclusions rest on bundled rules alone.
 
 ## Output contract
 
-The report opens with one line naming the skill version and the bundled permissions-map date from
+Every report opens with one line naming the skill version and the bundled permissions-map date from
 this file's frontmatter, and whether developer.jamf.com was reached, in the form
-`jamf-platform-api-migration 1.0.0-rc.1 · permissions map 2026-09-03 · live lookups: yes`. An admin who
-posts the output somewhere can then be told which rules produced it.
+`jamf-platform-api-migration 1.0.0 · permissions map 2026-09-03 · live lookups: yes`. **The version
+line is required and is never omitted,** from the report file or from the reply.
 
-**The version line is required and is never omitted.** Exactly one short sentence precedes it and
-nothing else does: the first line of the reply, naming the file the converted script was written to,
-in the form `Written to assign-user-platform.sh.` Where no file could be written it says that
-instead. Where the output is a stop report, which writes no file, it says in one sentence that the
-script does not convert, or that two inputs produced two stop reports. That sentence is the whole of
-the reply's introduction — no heading above it, no summary under it, nothing announcing what is
-coming — and every numbered section comes after the version line, so a reply whose first content is a
-heading or the converted script has skipped it and is wrong.
+**Two files, every time a filesystem is reachable: the converted script and the report.** The script
+is what the admin runs and the report is what they read; a report with no file leaves the admin
+copying the answer out of a transcript by hand.
 
-**The converted script is written to a file, and the same script is in the report.** Both, every
-time, wherever a filesystem is reachable. A code block with no file leaves an admin who pointed the
-skill at a script on their disk to copy the answer back out of a transcript by hand. A file with a
-pointer to it in place of section 1 loses the script the moment the report is pasted into a ticket,
-and section 1 forbids it. Neither one on its own is the deliverable.
+- **Where.** Both files go in the directory the input was read from. A script that arrived as text in
+  the conversation, with no path, goes in the working directory.
+- **The script's name.** Drop the input's leading product word where it has one, `pro-`, `protect-`,
+  `classic-`, `jss-`, or `jamf-`, and put `platform-` in front of what is left, keeping the extension:
+  `pro-delete-computer.sh` gives `platform-delete-computer.sh`, `assign-user.sh` gives
+  `platform-assign-user.sh`, `report.py` gives `platform-report.py`, and a name with no extension
+  gives `platform-name`. Text with no filename at all gives `platform-migration` and the language's
+  extension. The name is not a judgment call: a second run, or a diff against the first, has to be
+  able to predict it from the request alone.
+- **A merged script's name.** After the same stripping, take the hyphen-separated words the inputs
+  share from the left: `pro-delete-computer.sh` and `protect-delete-computer.sh` give
+  `platform-delete-computer.sh`; `before-pro.sh` and `before-protect.sh` give `platform-before.sh`.
+  Where they share no leading word, use the first input's stripped name. Never blend the names or
+  invent a descriptive one; the merge is explained in the report, not in the filename.
+- **The report's name.** The script's name with its extension replaced by `-report.md`:
+  `platform-delete-computer.sh` and `platform-delete-computer-report.md`. A stop writes no script and
+  still writes the report, named for the script the conversion would have produced, so `before.sh`
+  stops as `platform-before-report.md`, and the record sits beside the input it declined.
+- **Never over the input, never over anything else.** The input is read and left in place, untouched:
+  no edit, no rename, no backup copy. If a target name is already taken, add `-2`, `-3` to both
+  names and let the reply say what was used.
+- **The script first, then the report.** Write the script file. Then run `ls -l` on the input and,
+  where it shows an execute bit, run `chmod +x` on the written script: the file is created without
+  the bit, and a permission error is otherwise the admin's first experience of the converted script.
+  Where the input had no execute bit, or there is no shell, do nothing and say nothing about it. Then
+  write the report. Where the writing tool changes something on the way out, trailing whitespace
+  being the known case, the report says so.
+- **The report file does not carry the script.** Its first section names the script file; a copy
+  inside the report would drift from it.
+- **Where no file can be written,** a surface with no filesystem or a refused write, the reply
+  carries the whole report with the complete converted script as its last section, and says so in
+  its first line.
 
-- **The converted script is the only file the skill ever writes.** Not the report, not notes, not a
-  summary, not a copy of the input. The report is the reply itself: writing it to a file hands the
-  admin a document where they asked for an answer, and on a stop it manufactures the very file the
-  stop rule says not to write. One file, and it is a runnable script.
-- **Where.** The directory the input was read from. A script that arrived as text in the
-  conversation, with no path, goes in the working directory.
-- **Name.** The input's name with `-platform` before the extension: `assign-user.sh` gives
-  `assign-user-platform.sh`, `report.py` gives `report-platform.py`, an input with no extension
-  gives `name-platform`. Text with no filename at all gives `jamf-platform-migration` and the
-  language's extension. The name is not a judgment call — a second run, or a diff against the first,
-  has to be able to predict it from the request alone.
-- **Where several inputs merge into one script, the name comes from the first input the request
-  listed,** whole and unaltered: `pro-delete.sh` and `protect-delete.sh` merged give
-  `pro-delete-platform.sh`. Do not trim them down to a prefix they share, blend their names, or
-  invent a descriptive one; section 4 is where the merge gets explained, not the filename.
-- **Never over the input, never over anything else.** The input is read and left as it is, in place:
-  no edit, no rename, no backup copy, no writing the conversion back over it. If the target name is
-  already taken, add `-2`, `-3` and let the lead-in name what was used. The original is the only
-  thing the admin has to check the conversion against.
-- **The same text in both, and the file is written first.** Write the file, then produce section 1 by
-  reading back what was written rather than rendering the script a second time: two renderings of one
-  conversion drift, silently, and the drift lands in the copy the admin reads. The two are
-  byte-identical. Where the writing tool changes something on the way out, trailing whitespace being
-  the known case, the report says so, as it already has to.
-- **A stop report writes no file at all.** Nothing converted, so there is nothing to write, and a
-  file on disk contradicts a report that declined to produce one. Writing the stop report itself to a
-  file is not a substitute for the script that was never emitted; the reply carries the report and
-  the directory stays as it was found.
-- **Where no file can be written** — a surface with no filesystem, or a write that is refused — the
-  lead-in says so plainly and section 1 is the only copy the admin gets. Do not leave them to work
-  out that nothing reached disk.
+**The reply is three lines and nothing after the third.** The shape:
 
-The report follows the version line, in this order. Omit a section only when it is empty, and say so
-in one line rather than dropping it.
+    Wrote platform-delete-computer.sh and platform-delete-computer-report.md beside pro-delete-computer.sh.
+    jamf-platform-api-migration 1.0.0 · permissions map 2026-09-03 · live lookups: yes
+    Open the report: it starts with the integration to create and the three grants to pick.
 
-1. **Converted script.** Complete, in one code block, ready to run once the out-of-script steps in
-   section 8 are done. Never a fragment, never a diff, and never replaced by a pointer to the file
-   that was written: the report has to carry the script on a surface that has no filesystem, and the
-   block is what survives being pasted somewhere else. Present whether or not a file was written,
-   and where one was, a copy of it rather than a second rendering of the same conversion.
-2. **Scope level, region, and headers.** Which scope level the output assumes, and the one header
-   every gateway call carries. Then one line on the region in the host, saying which way it was
-   settled: derived by resolving the script's Jamf Pro or Classic hostname, naming the AWS region
-   the lookup returned and that the gateway is assumed to match it, or assumed `us` because the
-   script carried no host that answers. Either way the admin is told to correct the host if the
-   integration's details in Jamf Account disagree. An assumed region is never reported as a derived
-   one.
-3. **Capability grants.** One row per grant, resolved against the endpoints the output actually
-   emits, never the ones it replaced. Each row carries the grant string, the section and permission
-   name Jamf Account's picker shows for it, and the calls that need it. One capability covering
-   calls on two products is one row. Nothing here is emitted as comments in the script.
-4. **Changes.** Every edit, grouped as authentication, routes and versions, response handling,
+Line three is one sentence and never a summary of the report, which is read in the file. On a stop,
+line one says the script does not convert and names the report file, and line three says the
+report opens with why.
+
+The report file follows the version line, in this order. Omit a section only when it is empty, and
+say so in one line rather than dropping it.
+
+1. **Set up the integration.** First, because nothing runs until it exists. In order:
+   - The script file's name, and that it carries the execute bit where one was set.
+   - The scope level to mint the integration at and the one header every gateway call carries, with
+     the one-header, one-variable change for the other level in one line, or that an endpoint
+     forced the level.
+   - Under environment scope, what changed in reach, every time: the input's calls reached one
+     product tenant, and an environment-scoped integration reaches every tenant in the environment,
+     so a lookup can now match a record in a sibling tenant.
+   - The region in the host and how it was settled: derived by resolving the script's Jamf Pro or
+     Classic hostname, naming the AWS region the lookup returned and that the gateway is assumed to
+     match it, or assumed `us` because the script carried no host that answers. Either way the admin
+     is told to correct the host if the integration's details in Jamf Account disagree. An assumed
+     region is never reported as a derived one.
+   - The grants, one row per grant, resolved against the endpoints the output actually emits, never
+     the ones it replaced. Each row carries the grant string, the section and permission name Jamf
+     Account's picker shows for it, and the calls that need it. One capability covering calls on two
+     products is one row. Nothing here is emitted as comments in the script.
+   - The steps in Jamf Account: sign in, open **Integrations**, click **Create integration**, choose
+     the scope level and the environment or tenants, browse the capabilities and grant the rows
+     above, create it, copy the client ID and secret, and read the environment or tenant ID off the
+     **Integration details** panel by clicking its pill. An integration is valid for six months, so
+     name the renewal as part of the setup. Where the script was written against the
+     public beta, say plainly that GA deleted every beta integration client, so a fully correct
+     conversion still returns `401 {"error":"invalid_client"}` on its first call until a new
+     integration exists. `invalid_client` is also what a wrong secret returns, so the response cannot
+     distinguish a deleted client from a mistyped one; the Jamf Account integrations list is what
+     settles it, and an admin who assumes a typo re-checks the secret instead of minting a client.
+   - The one-time secret import, in the form `runtime-behavior.md` gives for the host the script
+     runs on, with the `-U` trap beside it where a new integration is minted.
+   - A credential the script reads from its caller, such as webhook headers, an event payload, or
+     the environment, changes name when it changes type, and the caller has to be reconfigured to
+     match. Name that change. A script correct in isolation that depends on an unmade change
+     elsewhere fails on the first real event.
+   - The links, verbatim:
+     - Jamf Account: https://account.jamf.com
+     - Creating an integration, step by step: https://developer.jamf.com/platform-api/reference/getting-started-with-platform-api
+     - Permissions map, capability to picker name: https://developer.jamf.com/platform-api/reference/jamf-pro-permissions-map
+     - Platform environments in Jamf Account: https://learn.jamf.com/r/en-US/jamf-account-documentation/Platform_Environments
+     - The Integrations privilege, if Integrations is not visible: https://learn.jamf.com/r/en-US/jamf-account-documentation/Creating_a_Custom_Role
+     - Moving an existing integration by hand: https://developer.jamf.com/platform-api/reference/move-an-existing-integration-to-the-platform-api-gateway
+2. **Changes.** Every edit, grouped as authentication, routes and versions, response handling,
    removals, and other. Each with its reason. Specifically:
    - A change the script's behavior did not force needs its reason, or the admin reverts it. Moving
      off a deprecated version is the case in point: the script works today, so "moved to the current
@@ -389,39 +437,21 @@ in one line rather than dropping it.
      they stay on that product's host, a gateway bearer token does not authenticate them, and the
      converted script still holds two credential sets and mints two tokens. "Two tokens became one"
      is the expected story and is wrong there.
-5. **Declined.** Every call left unconverted and why, distinguishing the calls that *could* have
+3. **Declined.** Every call left unconverted and why, distinguishing the calls that *could* have
    moved from the ones that could not. A refusal that does not make that distinction is
    indistinguishable from having failed to look, and an admin cannot act on it. "No gateway
    equivalent" does not mean broken: the product APIs still answer, so a script that cannot move has
    not stopped working. Say both, or a routing fact reads as an outage. The reason a call or a
    script cannot convert is the missing route, never the script's unrelated defects; a refusal
    resting on typos and race conditions reached the right answer for the wrong reason.
-6. **Divergences.** Every point where the conversion went outside what the rules describe, with
+4. **Divergences.** Every point where the conversion went outside what the rules describe, with
    what it hit, what it concluded, and the evidence. Empty is a valid answer and is stated.
-7. **Recommendations.** Repairs the conversion did not force, each with the code to apply it, none
-   applied. Defects named in section 4 land here with their fix. A secret-resolution ladder the
+5. **Recommendations.** Repairs the conversion did not force, each with the code to apply it, none
+   applied. Defects named in section 2 land here with their fix. A secret-resolution ladder the
    script already has stays as written, with the runtime read given here as a recommendation. A
    recommended Protect `.errors` check carries the reading rules from `protect-graphql.md`: only
    `AuthorizationError` is a denial, its two messages mean opposite things, and `NotFound`,
    `ArgumentValidationError`, and `Lambda:Unhandled` mean the resolver ran.
-8. **Out-of-script changes.** What has to happen outside the file before the script runs:
-   - Mint the integration in Jamf Account with the grants in section 3. Where the script was
-     written against the public beta, say plainly that GA deleted every beta integration client, so
-     a fully correct conversion still returns `401 {"error":"invalid_client"}` on its first call
-     until a new integration exists. `invalid_client` is also what a wrong secret returns, so the
-     response cannot distinguish a deleted client from a mistyped one; the Jamf Account
-     integrations list is what settles it, and an admin who assumes a typo re-checks the secret
-     instead of minting a client.
-   - The one-time secret import, in the form `runtime-behavior.md` gives for the host the script
-     runs on.
-   - A credential the script reads from its caller, such as webhook headers, an event payload, or
-     the environment, changes name when it changes type, and the caller has to be reconfigured to
-     match. Name that change. A script correct in isolation that depends on an unmade change
-     elsewhere fails on the first real event.
-   - The execute bit on the file that was written, where the original carried one. It is created
-     without it, so `chmod +x` is the difference between a runnable script and a permission error on
-     the first attempt. Nothing to say where no file was written or the original was not executable.
-   - Rotation of any live credential the input contained.
 
 **Secrets in the report.** Never reproduce a secret in order to report it. The variable name and
 line identify it completely for anyone holding the script, while echoing the value copies it into a
@@ -431,11 +461,15 @@ as one, plainly, because the reason the line exists is that its author believed 
 
 ### Stop report
 
-When step 6 or a script-level decline in step 2 stops the conversion, the output is a report with no
-converted script and no file written. It opens with the same version line and carries:
+When step 6 or a script-level decline in step 2 stops the conversion, the output is the report file
+named above with no script file, and the reply's first line says the script does not convert and
+where the report is. The report opens with the same version line and carries:
 
-1. The rule that stopped it and the reason behind the rule.
-2. What the conclusion rests on: the signals in the code, each named.
+1. The rule that stopped it and the reason behind the rule, and that this report is the whole
+   output: no script was written.
+2. What the conclusion rests on: the signals in the code, each named. A credential is identified
+   by its variable name and line number only, never by its value and never by quoting the line
+   that holds it, in this item and everywhere else in the report.
 3. What would have converted, in prose: each call's route and the capability its operation needs,
    and that the skill will convert it once the script runs somewhere else. Naming a capability an
    operation needs is a different statement from a grant list for an emitted script, and only the
@@ -446,16 +480,15 @@ converted script and no file written. It opens with the same version line and ca
 5. What does not survive the move: an on-device self-lookup, such as `ioreg` for the Mac's own
    serial, has no equivalent on an automation host, so the operation becomes an iteration over
    devices, which is a rewrite rather than a conversion. And what a retained product path does over
-   the gateway: `403 BAD_PERMISSIONS`, not 404, which reads as a permissions problem. That is why,
-   where no non-auth call has a route, converting the auth alone is worse than leaving the script
-   untouched. It says nothing about a script that does have a convertible call: step 2 governs that
-   one, and there a partial conversion is the required answer.
+   the gateway: `403 BAD_PERMISSIONS`, not 404, which reads as a permissions problem. So where no
+   non-auth call has a route, converting the auth alone is worse than leaving the script untouched;
+   a script with any convertible call is step 2's case and converts partially.
 6. The alternatives, named specifically. A stop with no alternative is a wall. For a Jamf
    Pro-deployed script: an automation host that Jamf Pro fires a webhook at, holding the script and
    one credential under one owner and running the operation server-side; Jamf Routines, which does
    this without standing up a server; JAWA, at `github.com/jamf/JAWA`. Where the values wanted are
    Jamf Pro's own, a configuration profile or an extension attribute reaches the same outcome with
    no API call and no credential at all.
-7. Everything else observed, and that none of it is the reason: a live credential, a token echoed
-   to a world-readable log, the script's ordinary bugs. A stop has to rest on the right reason or it
-   generalizes wrongly.
+7. Everything else observed, and that none of it is the reason: a secret literal in the input,
+   named by variable and line and never quoted, a token echoed to a world-readable log, the
+   script's ordinary bugs. A stop has to rest on the right reason or it generalizes wrongly.

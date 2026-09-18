@@ -12,7 +12,7 @@ four tokens   ──┼──▶  one platform gateway
 four hosts    ──┘
 ```
 
-![version](https://img.shields.io/badge/version-1.0.0--rc.1-1E88E5)
+![version](https://img.shields.io/badge/version-1.0.0-1E88E5)
 ![models](https://img.shields.io/badge/tested%20on-Claude%20Opus%20%7C%20Sonnet-8A2BE2)
 ![permissions map](https://img.shields.io/badge/mappings%20updated-2026--09--03-00897B)
 ![runs nothing](https://img.shields.io/badge/runs%20your%20script-never-C62828)
@@ -55,13 +55,17 @@ Then, in any session:
 
 Paste the script or point at its path. That is the whole ask.
 
-Two things come back: the converted script **written to a new file beside your original**, named for
-it with `-platform` added — `assign-user.sh` gives `assign-user-platform.sh`, `report.py` gives
-`report-platform.py` — and a report carrying that same script in full along with every change it
-made. Your original is read and left alone. On a surface with no filesystem, claude.ai among them,
-the report is the whole answer and its first line says so.
+Two files come back, both **written beside your original**: the converted script, named for yours
+with `platform-` in front and any leading product word dropped — `pro-delete-computer.sh` gives
+`platform-delete-computer.sh`, `assign-user.sh` gives `platform-assign-user.sh`, `report.py` gives
+`platform-report.py` — and its report, the script's name with `-report.md`, so
+`platform-delete-computer-report.md`. The reply in the chat is three lines: what was written, the
+version, and where to look. The report opens with the integration to create in Jamf Account and the
+grants to pick, with links, and then names every change it made. Your original is read and left
+alone. On a surface with no filesystem, claude.ai among them, the reply carries the whole report and
+its first line says so.
 
-The skill does not interview you before it works. Four things decide the output, and it settles each
+The skill does not interview you before it works. Five things decide the output, and it settles each
 one itself and tells you what it assumed:
 
 | What | How it decides |
@@ -70,9 +74,11 @@ one itself and tells you what it assumed:
 | **Region** | Derived by resolving your Jamf Pro or Classic hostname when the script carries one. Otherwise assumed `us`. The report always says which. |
 | **Where it runs** | Read from the code: an automation host, your Mac, a container or function, or an endpoint Jamf Pro deploys to. |
 | **What it is for** | Which calls carry the outcome and which are incidental. |
+| **One script or several** | One script converts. Several with the intent stated, "into one script" or "each on its own", convert as asked. Several with no stated intent is the one question it asks, with merge as the default. |
 
 Every one of those lands in the report with what to change if the assumption is wrong. You get a
-converted script or a clear stop, never a question in place of an answer.
+converted script or a clear stop; the only question it asks is the last row, and only when the
+request leaves it open.
 
 **claude.ai.** Zip this directory and upload it under Settings, Capabilities, Skills. The same files
 work unchanged.
@@ -86,9 +92,9 @@ to one surface.
 - **A model it was tested on.** Claude Sonnet or Claude Opus. Other frontier or local models may
   produce successful conversions, but the outcome is untested.
 - **The script.** Any language. It reads shell, Python, and anything else that makes HTTP calls.
-- **Permission to write one file.** The skill writes the converted script beside your original, and
-  asks first the way any file write in Claude Code does. Decline it and the report still carries the
-  script in full.
+- **Permission to write two files.** The skill writes the converted script and its report beside
+  your original, and asks first the way any file write in Claude Code does. Decline it and the reply
+  carries the report and the script in full.
 - **Network access to `developer.jamf.com`,** recommended but not required. With it, the skill pulls
   each endpoint's published page and reads the permission string, the scope types, and the current
   version off it. Without it, the conversion still completes from the bundled rules and the report
@@ -129,13 +135,12 @@ output script, and it makes no calls to the gateway.
 
 <br>
 
-Current version: **1.0.0-rc.1**, bundled permissions map dated **2026-09-03**. Both live in the
+Current version: **1.0.0**, bundled permissions map dated **2026-09-03**. Both live in the
 frontmatter of `SKILL.md`, and every report the skill writes opens with them.
 
 To see what you have, read `metadata.version` in the frontmatter of `SKILL.md`. That answer is the same
 however you got the directory — pulled from the repository, cloned, or uploaded as a zip to claude.ai or
-the Skills API. Releases are tagged `jamf-platform-api-migration-v<version>`; the skill name is in the
-tag because the repository holds more than this one skill.
+the Skills API.
 
 What moves the number:
 
@@ -151,11 +156,34 @@ says which conclusions came from the bundled copy.
 </details>
 
 <details>
+<summary><b>Updating</b>: how you learn a newer version exists, and how to get it</summary>
+
+<br>
+
+Each time it is invoked with network access, the skill reads the version published on `main` of this
+repository and compares it with the one installed. When the published one is newer it says so, prints
+the install command, and stops. The install command above is also the update command: it replaces the
+installed files in place. Run it, then start a new session, because a session that has already loaded
+the old files keeps them until it ends. A copy uploaded as a zip to claude.ai or the Skills API is
+updated by uploading the new zip.
+
+The skill never modifies its own files. Without network access there is no check, and the version
+line at the top of every report is what you have.
+
+</details>
+
+<details>
 <summary><b>Changelog</b></summary>
 
 <br>
 
-- **1.0.0-rc.1**, unreleased. Release candidate for the first public version.
+- **1.0.0**, 2026-09-17. First release. Since the release candidate: the converted script carries the
+  execute bit where the original did; output names lead with `platform-`; two or more scripts with no
+  stated intent get one question, merge or separate, with merge as the default; the report is written
+  to a Markdown file beside the script and the reply shrinks to three lines; the report opens with the
+  integration to create in Jamf Account and the grants to pick, with documentation links; the skill
+  checks for a newer published version on invocation.
+- **1.0.0-rc.1**, 2026-09-11. Release candidate, superseded.
 
 </details>
 
@@ -193,7 +221,7 @@ region, so those scripts get `us` as a stated assumption instead.
 **What the skill fetches.** Only `developer.jamf.com` pages: a category index and individual
 endpoint pages, paced. Plus the DNS lookup above. Nothing is sent anywhere.
 
-**Divergences.** Every report ends with the points where the script presented something no rule
+**Divergences.** Every report carries a section for the points where the script presented something no rule
 covers and what the skill concluded from the published surface. A divergence that recurs across
 scripts is a rule this skill is missing.
 [Open an issue](https://github.com/Jamf-Concepts/agent-skills/issues) with the divergence text; do not

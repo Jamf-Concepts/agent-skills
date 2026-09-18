@@ -133,7 +133,7 @@ Every form below becomes the one exchange above. None has a gateway path.
   `grant_type=client_credentials` or `.access_token` to it breaks the half of the script that never
   moved.
 - **Base64 is an encoding.** A hardcoded `Authorization: Basic` value is a plain-text credential
-  and is treated as live: reported, rotated, never reproduced. The report says so plainly, because
+  and is treated as live: reported, never reproduced. The report says so plainly, because
   the reason the line exists is that its author believed otherwise.
 
 ## Route resolution
@@ -338,7 +338,7 @@ versions changed, so "already platform" is not "already current."
 | `/tenant/{tenantId}/…` or `/environment/{id}/…` in the path | The scope header, following the *new* integration's scope level |
 | `cb/engine` slug | `compliance-benchmarks` |
 | `{action}:{product}:{capability}` grant strings | `{capability}:{action}`, converted per `capability-grants.md` |
-| Beta integration client ID and secret | A new integration. GA deleted every beta client. |
+| Beta integration client ID and secret | A new integration, valid for six months. GA deleted every beta client. |
 
 - **A tenant ID in a beta path does not automatically become `X-Tenant-Id`.** The header follows
   the new integration's scope level, and the beta client's scope did not survive it. Under
