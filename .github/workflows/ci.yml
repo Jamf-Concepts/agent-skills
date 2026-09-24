@@ -23,6 +23,7 @@ jobs:
           python-version: "3.x"
 
       - name: Python lint
+        if: hashFiles('plugins/**/*.py') != ''
         run: |
           pip install ruff==0.16.7 --quiet
           ruff check plugins/
