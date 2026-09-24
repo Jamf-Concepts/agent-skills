@@ -1,4 +1,4 @@
-# CLAUDE.md — \<repo_name\>
+# CLAUDE.md — agent-skills
 
 ## What This Repo Does
 
@@ -19,6 +19,15 @@ npm run dev
 - `src/main.ts` — entry point
 - `config/` — configuration files
 -->
+
+## Where a New Skill Goes
+
+Two packagings, two directories. Both hold agent skills; the difference is how a user installs one.
+
+- `plugins/<plugin-name>/` — ships as a Claude Code plugin, follows the `.claude-plugin` structure, and must be registered in `.claude-plugin/marketplace.json`. Its skills are namespaced on invocation: `/plugin-name:skill-name`.
+- `skills/<skill-name>/` — ships as a plain skill directory a user drops into their own skills directory or uploads to claude.ai. No registration; `SKILL.md` is the whole contract, and the skill is invoked by its own name. Include a `README.md` so the directory explains itself on GitHub.
+
+Adding either one means updating the Available Skills table in `README.md` in the same PR.
 
 ## Branch Flow
 

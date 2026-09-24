@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Validate JSON
+        run: |
+          find . -name "*.json" -not -path "*/.git/*" \
+            | xargs -I {} python3 -m json.tool {} > /dev/null
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.x"
+
+      - name: Python lint
+        run: |
+          pip install ruff==0.16.7 --quiet
+          ruff check plugins/
