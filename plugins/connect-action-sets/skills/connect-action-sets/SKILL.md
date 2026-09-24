@@ -958,7 +958,7 @@ are live-verified in deployed production action sets (`FnSyncGroupToTarget`, `Sy
 > **Unverified ES6+ — do not use without a live test:** template literals (backticks), `const`/`let`,
 > destructuring, optional chaining (`?.`), nullish coalescing (`??`), spread/rest (`...`),
 > async/await, `class`, `Promise`. Stick to `var`, `function`, and string concatenation for these
-> cases. (Note: some external lint tooling — connect-api `expr.py`, riadmin `connect_check_expression` —
+> cases. (Note: some external lint tooling — connect-api `expr.py` —
 > flags even arrow functions as errors; that specific rule is a confirmed false positive. Arrows work.)
 
 ### Arrow functions

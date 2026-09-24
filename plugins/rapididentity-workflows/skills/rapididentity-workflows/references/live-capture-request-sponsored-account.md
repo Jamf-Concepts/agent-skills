@@ -1,7 +1,7 @@
 # Live capture — "Request Sponsored Account" (sandbox tenant)
 
 Captured 2026-07-28 via `GET /api/rest/admin/workflow/workflowDefinitions/176f6c88-3393-4d89-9540-c95bf922336b`
-(riadmin `requests_get_workflow_definition`, sandbox tenant, definition version 4). This is the
+(sandbox tenant, definition version 4). This is the
 ground truth for field names in this skill — when a doc and this capture disagree, this capture
 wins. HTML email bodies are elided (`...`) for size; every field name and structure is verbatim.
 
@@ -150,4 +150,4 @@ approval action's id; optional fields use `editableActionIds` instead; `LIST` it
 ```
 
 Other item types seen in this form: `DATE_TIME` (`idautopersonenddate`, "When does access end?").
-An `ATTACHMENT` type item was confirmed in a separate live capture (riadmin backlog #31).
+An `ATTACHMENT` type item was confirmed in a separate live capture.
