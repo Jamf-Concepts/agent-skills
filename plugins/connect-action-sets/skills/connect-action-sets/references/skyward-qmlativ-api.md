@@ -1,6 +1,6 @@
 # Skyward Qmlativ — API Reference for Connect Action Sets
 
-## Authentication — `defineSkywardQmlativOAuthConnection`
+## Authentication — `defineSkywardOAuthConnection`
 
 POSTs to `{Global.skywardBaseURL}/oauth/token` with:
 - `Authorization: Basic <base64(clientID:clientSecret)>`
@@ -23,7 +23,7 @@ Returns the OAuth response data object (contains `access_token`) on success, `fa
 
 ---
 
-## Workers API — `FnRetrieveQmlativEmployeeRecords`
+## Workers API — `FnRetrieveEmployeeRecords`
 
 **Returns:** Record map keyed by `NameIDNumber.NameIDNumber`, or `false` on failure.
 
@@ -40,7 +40,7 @@ Authorization: Bearer {session}
 
 | Arg | Type | Required | Notes |
 |---|---|---|---|
-| `session` | string | No | Bearer token. Opens via `FnOpenConnections("Skyward - Qmlativ")` if not provided. |
+| `session` | string | No | Bearer token. Opens via `FnOpenConn("Skyward - Qmlativ")` if not provided. |
 | `module` | enum:Employee | No | Qmlativ module name (e.g. `Employee`) |
 | `object` | enum:Employee | No | Qmlativ object name (e.g. `Employee`) |
 
@@ -66,9 +66,9 @@ Also serialized to `/output/Qmlativ/QmlativEmployees.json`.
 
 ---
 
-## Single-Record Lookup — `FnRetrieveQmlativEmployeeRecordsWithID`
+## Single-Record Lookup — `FnRetrieveEmployeeRecordsWithID`
 
-Same as above but adds `personnelNumber` arg (required). Iterates all pages until it finds the match, then returns early with a single-entry record map. **Performance note:** Still iterates all pages — no server-side filter. Use `FnRetrieveQmlativEmployeeRecords` once and look up in-memory if multiple lookups are needed.
+Same as above but adds `personnelNumber` arg (required). Iterates all pages until it finds the match, then returns early with a single-entry record map. **Performance note:** Still iterates all pages — no server-side filter. Use `FnRetrieveEmployeeRecords` once and look up in-memory if multiple lookups are needed.
 
 ---
 
@@ -77,7 +77,7 @@ Same as above but adds `personnelNumber` arg (required). Iterates all pages unti
 | Global | Purpose |
 |---|---|
 | `SharedGlobal.skywardBaseURL` | Skyward base URL, e.g. `https://district.skyward.com/api/` |
-| `SharedGlobal.qmlativAPI` | Custom API base URL (set by `FnOpenConnections` from `skywardBaseURL`) |
+| `SharedGlobal.qmlativAPI` | Custom API base URL (set by `FnOpenConn` from `skywardBaseURL`) |
 | `SharedGlobal.skywardClientID` | OAuth Client ID ("Key" from Integration Access) |
 | `SharedGlobal.skywardClientSecret` | OAuth Client Secret — must be `decrypt(...)` value |
 

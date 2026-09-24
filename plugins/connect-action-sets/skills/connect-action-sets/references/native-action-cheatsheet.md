@@ -692,7 +692,7 @@ Record whose values are compared strictly (`"false"` is truthy; `"50" !== 50`) o
 ]}
 ```
 
-Always `copyRecord` before mutating. Required for `FnHasRecordChanged` snapshots.
+Always `copyRecord` before mutating. Required for `FnHasChanged` snapshots.
 
 ---
 
@@ -1272,13 +1272,13 @@ Also callable inline: `toJSON(obj)` or `toJSON(obj, true)` in any `value=` expre
 
 ---
 
-## Connections — FnCoreOpenConnections
+## Connections — FnOpenConns
 
 ### Single system
 
 **XML:**
 ```xml
-<action id="UUID" name="FnCoreOpenConnections" outputVar="conns" disabled="false">
+<action id="UUID" name="FnOpenConns" outputVar="conns" disabled="false">
   <arg name="targetSystem" value="&quot;ad&quot;"/>
 </action>
 <action id="UUID" name="if" disabled="false">
@@ -1302,7 +1302,7 @@ Also callable inline: `toJSON(obj)` or `toJSON(obj, true)` in any `value=` expre
 
 **MCP JSON:**
 ```json
-{"id":"UUID","name":"FnCoreOpenConnections","outputVar":"conns","project":"ref_ConnectLibrary","args":[
+{"id":"UUID","name":"FnOpenConns","outputVar":"conns","project":"ref_SharedLibrary","args":[
   {"name":"targetSystem","value":"\"ad\""}
 ]},
 {"id":"UUID","name":"if","args":[
@@ -1328,21 +1328,21 @@ Also callable inline: `toJSON(obj)` or `toJSON(obj, true)` in any `value=` expre
 
 **XML:**
 ```xml
-<action id="UUID" name="FnCoreOpenConnections" outputVar="conns" disabled="false">
+<action id="UUID" name="FnOpenConns" outputVar="conns" disabled="false">
   <arg name="targetSystem" value="&quot;ad,google,microsoft&quot;"/>
 </action>
 ```
 
 **MCP JSON:**
 ```json
-{"id":"UUID","name":"FnCoreOpenConnections","outputVar":"conns","project":"ref_ConnectLibrary","args":[
+{"id":"UUID","name":"FnOpenConns","outputVar":"conns","project":"ref_SharedLibrary","args":[
   {"name":"targetSystem","value":"\"ad,google,microsoft\""}
 ]}
 ```
 
 `conns.ad.session`, `conns.google.session`, `conns.microsoft.session` all available after one call. Add failure guards per prefix as needed.
 
-**CA constraint:** Community Adapter sets must NOT call `FnCoreOpenConnections` — use typed built-in actions (`openADConnection`, `defineGoogleExtendedOAuthConnection`, etc.) directly.
+**CA constraint:** Community Adapter sets must NOT call `FnOpenConns` — use typed built-in actions (`openADConnection`, `defineGoogleExtendedOAuthConnection`, etc.) directly.
 
 ---
 

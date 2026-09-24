@@ -81,7 +81,7 @@ for line in open("pvp.log", encoding="utf-8", errors="replace"):
 
 ## Known failure signature: broken username policy → `@username` literal leaks into mods
 
-Seen in a Fulton `pvp.log` run where 13,785 of 14,481 staff updates failed:
+Seen in a customer `pvp.log` run where 13,785 of 14,481 staff updates failed:
 
 - LDAP error: `resultCode=65 (object class violation) ... object class 'idautoPerson'
   requires attribute 'idautoPersonUserNameMV'`
@@ -89,7 +89,7 @@ Seen in a Fulton `pvp.log` run where 13,785 of 14,481 staff updates failed:
   — the username policy rule cleared the required multi-valued username attribute.
 - The **same** diffs also wrote the literal, unsubstituted string `@username` into other
   fields derived from it (`idautoPersonSAMAccountName`, `mail`, `idautoPersonExt2` — e.g.
-  `"@username@fultonschools.org"`). `@username` is the **read-only pseudo-attribute** that
+  `"@username@example.edu"`). `@username` is the **read-only pseudo-attribute** that
   holds the candidate username inside a policy rule (see `SKILL.md` § Policy
   Pseudo-Attributes) — its literal appearance in output means the username-generation
   expression itself failed to resolve to a value and something downstream just

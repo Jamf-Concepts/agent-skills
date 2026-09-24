@@ -260,7 +260,7 @@ queries for two jobs: **finding test data before a run** and **verifying effects
 |---|---|
 | `search-users` | Find a real user to run a `Fn*`/job against; confirm attribute values before and after |
 | `get-user-info-in-delegation` | Fuller profile view within a delegation; **accepts a raw LDAP filter passed verbatim** (access control is enforced server-side, so filters can be passed through without sanitizing) |
-| `search-groups` / `get-group-members` | Verify group-membership syncs actually landed (e.g. after `ManageRIGroupMemberships`-style jobs) |
+| `search-groups` / `get-group-members` | Verify group-membership syncs actually landed (e.g. after `ManageGroupMembership`-style jobs) |
 | `get-user-activity-from-audit-log` | **Verify your `logAuditEvent` calls**: after a run that writes audit events, pull the target user's activity for the run window and confirm the events appear with the right eventName/target |
 | `get-password-policies-for` / `set-password` | Password-flow testing (set-password goes through delegations — confirm with the user before mutating) |
 | `search-entitlements-for-user` / `start-entitlement-request` / `get-my-delegations` | Portal/WFM context — e.g. kick off an entitlement request to exercise a WFM action set end-to-end (see the `rapididentity-workflows` skill) |

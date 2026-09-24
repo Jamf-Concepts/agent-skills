@@ -94,7 +94,7 @@ Three rules about the indented form:
 | String escapes (`\\`, `\"`, `\n`, `\t`, `\uXXXX`) | § setVariable Expression Compiler Rules |
 | setVariable vs copyRecord — reference vs deep copy, array mutation rule | § setVariable vs copyRecord |
 | Naming (prefixes, camelCase, reserved labels) | § Naming Scheme |
-| **`label` quoting — bare on `section`/`forEach`/`while`/`continue`/`break`, quoted only on `caFnCoreLog`** | § Section Labels |
+| **`label` quoting — bare on `section`/`forEach`/`while`/`continue`/`break`, quoted only on `caFnLog`** | § Section Labels |
 | `about` section content (verbose Purpose + pseudo-code, plain ASCII) | § about Section |
 | `defineDefaultVariables` content | § defineDefaultVariables Section |
 | Logging — built-in `log` action | § Logging |
@@ -110,7 +110,7 @@ Three rules about the indented form:
 | Calling other action sets (function mode) | § Function Mode Pattern |
 | Community Adapter (ca) authoring — naming, sessions, dependencies, param order | § Community Adapter (ca) Action Set Authoring |
 | **Fast task → builtin lookup** (strings, arrays, records, dates, DNs, crypto, connections) | `references/native-action-cheatsheet.md` |
-| Connections — FnCoreOpenConnections (canonical), typed built-in actions per system, AES CA | § Connections → `references/connections.md` |
+| Connections — FnOpenConns (canonical), typed built-in actions per system, AES CA | § Connections → `references/connections.md` |
 | Global property references | § Global Properties |
 | Standard SharedGlobals keys by category (AD, Google, M365, DB, meta, etc.) | `references/shared-globals.md` |
 | HTTP actions — REST API patterns | § HTTP Actions |
@@ -437,7 +437,7 @@ points to the **same object in memory**. Both names are aliases for the same dat
 <!-- oldRecord and newRecord are now the same object -->
 <!-- Modifying newRecord also modifies oldRecord -->
 <action name="setRecordFieldValue"><arg name="record" value="newRecord"/><arg name="field" value="&quot;someAttr&quot;"/><arg name="value" value="&quot;test&quot;"/></action>
-<!-- FnHasRecordChanged will return false — they're the same object, nothing "changed" -->
+<!-- FnHasChanged will return false — they're the same object, nothing "changed" -->
 ```
 
 Use `copyRecord` (for records) or `copyArray` (for arrays) to get a true independent copy:
@@ -449,7 +449,7 @@ Use `copyRecord` (for records) or `copyArray` (for arrays) to get a true indepen
 
 <!-- Now modifying newRecord does NOT affect oldRecord -->
 <action name="setRecordFieldValue"><arg name="record" value="newRecord"/><arg name="field" value="&quot;someAttr&quot;"/><arg name="value" value="&quot;test&quot;"/></action>
-<!-- FnHasRecordChanged will correctly detect the difference -->
+<!-- FnHasChanged will correctly detect the difference -->
 ```
 
 ### When each applies
@@ -563,11 +563,11 @@ iterated breaks the loop.
 
 Rules:
 - No underscores except `_*` names (the `DL` prefix uses no underscore)
-- CamelCase throughout: `SyncADSToRI`, `ManageGroupMemberships`, `FnGetUser`, `BuildStaffCSVForIDHub`
+- CamelCase throughout: `SyncUsersToTarget`, `ManageGroupMembership`, `FnGetUserRecord`, `BuildStaffCSV`
 
 **`Build` vs. `Sync` vs. `Report`:** Use `Build` when the action set's *only* output is a CSV file
 that another system ingests, and it is not a human-facing report. IDHub import files are always
-`Build` (e.g. `BuildStaffCSVForIDHub`), but the prefix applies to any CSV-only producer. If the
+`Build` (e.g. `BuildStaffCSV`), but the prefix applies to any CSV-only producer. If the
 action set also performs the downstream import/sync itself, it's a `Sync`; if it produces a
 human-facing report, it's a `Report`.
 
@@ -586,11 +586,11 @@ human-facing report, it's a `Report`.
   <!-- WRONG: the label becomes the literal text "checkExcludedDomain", quote characters included -->
   <arg name="label" value="&quot;checkExcludedDomain&quot;"/>
   ```
-  **Do not generalize this to every `label` arg by name** — `caFnCoreLog`'s `label` parameter is
+  **Do not generalize this to every `label` arg by name** — `caFnLog`'s `label` parameter is
   `type="string"` (an expression), so it *is* quoted like any other string literal:
   `<arg name="label" value="&quot;fetchAllUsers&quot;"/>`. Same argument name, different `type`,
   opposite quoting rule. Before quoting or not quoting a `label`, check the owning action:
-  `section`/`forEach`/`while`/`continue`/`break` → bare; `caFnCoreLog` → quoted. When unsure of a
+  `section`/`forEach`/`while`/`continue`/`break` → bare; `caFnLog` → quoted. When unsure of a
   new or unfamiliar action's `label` type, `lookup_action` it rather than guessing from a nearby
   example. The validator does not catch a wrongly-quoted `name`-type `label` — it exempts `label`
   from expression checking entirely, so this passes `build`/`validate` clean while still being wrong.
@@ -952,8 +952,8 @@ name. Use this when an inner condition should skip to the next iteration of a sp
 
 The Connect expression engine is at least partially ES6-capable. The following are confirmed working
 and are the established idioms used in the ConnectLibrary examples — arrow functions and `new Set()`
-are live-verified in deployed production action sets (`FnSyncGroupToGoogle`, `SyncGroupsFull`,
-`FnRISaveRecord`, `BuildAllUsersCSVForIDHub`).
+are live-verified in deployed production action sets (`FnSyncGroupToTarget`, `SyncGroups`,
+`FnSaveRecord`, `BuildUsersCSV`).
 
 > **Unverified ES6+ — do not use without a live test:** template literals (backticks), `const`/`let`,
 > destructuring, optional chaining (`?.`), nullish coalescing (`??`), spread/rest (`...`),
@@ -974,7 +974,7 @@ Arrow functions evaluate inside expressions, including as callbacks to `filter`,
 
 Define a reusable function by assigning a **named function** to a variable with `setVariable`. The
 function binds to that variable name and may recurse. This is the house idiom (e.g. `arrayDeepCopy`,
-`recursiveArraySort` in `FnHasRecordChanged`). Multi-line bodies are allowed inside the `value`
+`recursiveArraySort` in `FnHasChanged`). Multi-line bodies are allowed inside the `value`
 attribute — the editor stores the newlines; the "single-line compact" XML rule governs element
 structure, not attribute contents.
 
@@ -1212,8 +1212,8 @@ always-include rule), the rules in this section override them for Community Adap
 ### What Community Adapters are
 
 A Community Adapter is a portable, self-contained Connect project that wraps an external
-system's API — or a set of core utilities — in typed action sets (e.g. `caEntra` for Microsoft
-Entra/Graph, `caIDHub` for the IDHub External REST API, `caCoreFunctions` for the core `Fn*`
+system's API — or a set of core utilities — in typed action sets (e.g. `caExampleSystem` for Microsoft
+Entra/Graph, `caExampleSystem` for the IDHub External REST API, `caCoreUtils` for the core `Fn*`
 utility library). They are designed to be imported and called by any project without depending
 on another project's internals.
 
@@ -1228,7 +1228,7 @@ on another project's internals.
 | `{category}` | functional or system category of the action set | `AD`, `Group`, `User` |
 | `{function}` | the function the action set serves | `IsAccountDisabled` |
 
-No underscores. Example: `caFnADIsAccountDisabled`
+No underscores. Example: `caCoreUtilsADIsAccountDisabled`
 
 ### defineDefaultVariables (CA override)
 
@@ -1236,11 +1236,11 @@ Include the `process` (or `processVariables`) object **only if the user explicit
 it** — do not add it by default. This overrides the always-include rule in § defineDefaultVariables
 Section, for Community Adapter action sets only.
 
-### Logging with FnCoreLog / caFnCoreLog
+### Logging with FnLog / caFnLog
 
-If the user has instructed you to use `FnCoreLog` or `caFnCoreLog`, define a variable
+If the user has instructed you to use `FnLog` or `caFnLog`, define a variable
 `actionSetName = getCurrentActionSetName()` and pass that variable to the `actionSetName`
-parameter of the `FnCoreLog` / `caFnCoreLog` call.
+parameter of the `FnLog` / `caFnLog` call.
 
 ### Parameter (argDef) order
 
@@ -1259,8 +1259,8 @@ HTML. Keep it as a single attribute string (use ` | ` or `;` as separators).
 ### Sessions
 
 - **Do not open connections with action sets that live outside the adapter's own project
-  folder.** This specifically rules out shared helpers like `FnCoreOpenConnections` and
-  `FnOpenConnections`. Use a Connect **built-in** connection action
+  folder.** This specifically rules out shared helpers like `FnOpenConns` and
+  `FnOpenConn`. Use a Connect **built-in** connection action
   (`defineCloudPortalConnection()`, `openMetadirLDAPConnection()`, `openADConnection`), or a
   connection action set that lives **within the same project folder**.
 - If only one session is required, name the parameter `session`.
@@ -1310,21 +1310,21 @@ When deciding which Connect action to use, follow this order:
 
 ## Connections
 
-For non-Community-Adapter action sets, use `FnCoreOpenConnections` (`ref_ConnectLibrary`) as the single entry point. It opens one or more connections per call and returns a `conns` record keyed by prefix (`conns.ad.session`, `conns.google.session`, etc.). For CA sets, use the built-in typed actions directly (CA sets cannot call outside their project folder).
+For non-Community-Adapter action sets, use `FnOpenConns` (`ref_SharedLibrary`) as the single entry point. It opens one or more connections per call and returns a `conns` record keyed by prefix (`conns.ad.session`, `conns.google.session`, etc.). For CA sets, use the built-in typed actions directly (CA sets cannot call outside their project folder).
 
 | Target system | Non-CA approach | CA approach |
 |---|---|---|
-| Active Directory | `FnCoreOpenConnections(targetSystem="ad")` | `openADConnection` + `getIdBridgeConnectInfo` |
-| Google | `FnCoreOpenConnections(targetSystem="google")` | `defineGoogleExtendedOAuthConnection` |
-| Microsoft 365 | `FnCoreOpenConnections(targetSystem="microsoft")` | OAuth2 `httpPOST` for bearer token |
-| RapidIdentity Metadirectory | `FnCoreOpenConnections(targetSystem="RapidIdentity")` | `openMetadirLDAPConnection` (no args) |
-| RapidIdentity Portal | `FnCoreOpenConnections(targetSystem="Portal")` | `defineCloudPortalConnection` (no args) |
-| Database | `FnCoreOpenConnections(targetSystem="db")` | `openDatabaseConnection` + bridge |
+| Active Directory | `FnOpenConns(targetSystem="ad")` | `openADConnection` + `getIdBridgeConnectInfo` |
+| Google | `FnOpenConns(targetSystem="google")` | `defineGoogleExtendedOAuthConnection` |
+| Microsoft 365 | `FnOpenConns(targetSystem="microsoft")` | OAuth2 `httpPOST` for bearer token |
+| RapidIdentity Metadirectory | `FnOpenConns(targetSystem="RapidIdentity")` | `openMetadirLDAPConnection` (no args) |
+| RapidIdentity Portal | `FnOpenConns(targetSystem="Portal")` | `defineCloudPortalConnection` (no args) |
+| Database | `FnOpenConns(targetSystem="db")` | `openDatabaseConnection` + bridge |
 | AES encrypt/decrypt | AES CA actions directly (`GenerateAESKey`, `AESEncrypt`, `AESDecrypt`) | same |
 
 Only **closeable** connection/IO actions are closed with `<action name="close"><arg name="closeable" value="session"/></action>`. OAuth2 / HTTP Basic connections (Microsoft Graph, Google OAuth) hold a token, not a handle, and are **not** closed.
 
-**Full per-system details — `FnCoreOpenConnections` Global key requirements, built-in connection args, `getLDAPRecords` `baseDn`/`attributes` selection, the AES sequence, failure handling, and closing — are in `references/connections.md`. Read it before authoring any connection logic. Fast calling-pattern lookup: `references/native-action-cheatsheet.md` § Connections.**
+**Full per-system details — `FnOpenConns` Global key requirements, built-in connection args, `getLDAPRecords` `baseDn`/`attributes` selection, the AES sequence, failure handling, and closing — are in `references/connections.md`. Read it before authoring any connection logic. Fast calling-pattern lookup: `references/native-action-cheatsheet.md` § Connections.**
 
 ---
 ## Auditing — logAuditEvent
@@ -1422,7 +1422,7 @@ Every parameter must have a `description` attribute. Types:
 ### Function action set
 
 ```xml
-<actionDef xmlns="urn:idauto.net:dss:actiondef" name="FnMyFunction" returnsValue="true" description="Function - RI: One-sentence description."><argDefs><argDef name="session" type="object" optional="true" description="Existing directory session; opens one if omitted."/><argDef name="logOnly" type="boolean" optional="true" description="Suppress writes when true."/><argDef name="logLevel" type="enum:quiet,normal,debug" optional="true" description="Logging verbosity."/></argDefs><actions><action id="00000001-0000-0000-0000-000000000001" name="section" outputVar="" disabled="false"><arg name="label" value="about"/><arg name="suppressTrace" value="true"/><arg name="do"><action id="00000001-0000-0000-0000-000000000002" name="comment" outputVar="" disabled="false"><arg name="comment" value="Last Modified By: "/></action><action id="00000001-0000-0000-0000-000000000003" name="comment" outputVar="" disabled="false"><arg name="comment" value="Last Modified Date: YYYY-MM-DD"/></action><action id="00000001-0000-0000-0000-000000000004" name="comment" outputVar="" disabled="false"><arg name="comment" value="Purpose:"/></action><action id="00000001-0000-0000-0000-00000000000A" name="comment" outputVar="" disabled="false"><arg name="comment" value="  One-paragraph logical overview: what it does, inputs, outputs, key branches."/></action><action id="00000001-0000-0000-0000-00000000000B" name="comment" outputVar="" disabled="false"><arg name="comment" value="Overview (pseudo-code):"/></action><action id="00000001-0000-0000-0000-00000000000C" name="comment" outputVar="" disabled="false"><arg name="comment" value="  describe the flow in plain words, indented for nesting"/></action><action id="00000001-0000-0000-0000-000000000005" name="comment" outputVar="" disabled="false"><arg name="comment" value="Parameters:"/></action><action id="00000001-0000-0000-0000-000000000006" name="comment" outputVar="" disabled="false"><arg name="comment" value="  session [optional]: Existing directory session."/></action><action id="00000001-0000-0000-0000-000000000007" name="comment" outputVar="" disabled="false"><arg name="comment" value="  logOnly [optional]: Suppress writes when true."/></action><action id="00000001-0000-0000-0000-000000000008" name="comment" outputVar="" disabled="false"><arg name="comment" value="  logLevel [optional]: quiet | normal | debug."/></action><action id="00000001-0000-0000-0000-000000000009" name="comment" outputVar="" disabled="false"><arg name="comment" value="================== Change Log =================="/></action><action id="00000001-0000-0000-0000-000000000010" name="comment" outputVar="" disabled="false"><arg name="comment" value="YYYY-MM-DD (Name): Initial version."/></action></arg></action><action id="00000002-0000-0000-0000-000000000001" name="section" outputVar="" disabled="false"><arg name="label" value="defineDefaultVariables"/><arg name="suppressTrace" value="true"/><arg name="do"><action id="00000002-0000-0000-0000-000000000002" name="setVariable" outputVar="" disabled="false"><arg name="name" value="process"/><arg name="value" value="{actionSetName:getCurrentActionSetName(),processID:getProcessID(),processJobName:getProcessJobName()||getProcessTopLevelActionSetName(),processLogFile:getProcessLogFile(),processProject:getProcessProject() == &quot;&quot; ? &quot;Main&quot; : getProcessProject(),processStartTime:formatDate(getProcessStartTime(),&quot;yyyy-MM-dd HH:mm:ss&quot;,Global.localTimeZone),runningIDHub:runningIDHub()}"/></action><action id="00000002-0000-0000-0000-000000000003" name="setVariable" outputVar="" disabled="false"><arg name="name" value="logLevel"/><arg name="value" value="logLevel || &quot;quiet&quot;"/></action><action id="00000002-0000-0000-0000-000000000004" name="setVariable" outputVar="" disabled="false"><arg name="name" value="logColors"/><arg name="value" value="Object.assign({changedData:&quot;chocolate&quot;,complete:&quot;teal&quot;,counts:&quot;black&quot;,data:&quot;blue&quot;,debug:&quot;purple&quot;,error:&quot;red&quot;,fail:&quot;darkred&quot;,info:&quot;royalBlue&quot;,logOnly:&quot;slateGray&quot;,processing:&quot;steelBlue&quot;,query:&quot;darkcyan&quot;,skipped:&quot;mediumpurple&quot;,sourceData:&quot;dimGray&quot;,success:&quot;green&quot;,targetData:&quot;darkslategray&quot;,test:&quot;darkorange&quot;,warn:&quot;goldenrod&quot;,whitespace:&quot;white&quot;},Global.connectLogColorSchema||{})"/></action><action id="00000002-0000-0000-0000-000000000005" name="setVariable" outputVar="" disabled="false"><arg name="name" value="counts"/><arg name="value" value="{processed:0,add:0,update:0,skip:0,error:0}"/></action></arg></action><action id="00000003-0000-0000-0000-000000000001" name="section" outputVar="" disabled="false"><arg name="label" value="establishConnections"/><arg name="suppressTrace" value="true"/><arg name="do"><action id="00000003-0000-0000-0000-000000000002" name="comment" outputVar="" disabled="false"><arg name="comment" value="Function mode: use provided session or open one."/></action></arg></action><action id="00000004-0000-0000-0000-000000000001" name="section" outputVar="" disabled="false"><arg name="label" value="mainLogic"/><arg name="suppressTrace" value="true"/><arg name="do"><action id="00000004-0000-0000-0000-000000000002" name="comment" outputVar="" disabled="false"><arg name="comment" value="Core logic here."/></action></arg></action><action id="00000005-0000-0000-0000-000000000001" name="section" outputVar="" disabled="false"><arg name="label" value="closeConnections"/><arg name="suppressTrace" value="true"/><arg name="do"><action id="00000005-0000-0000-0000-000000000002" name="comment" outputVar="" disabled="false"><arg name="comment" value="Close only if we opened (check closeSession flag)."/></action></arg></action><action id="00000006-0000-0000-0000-000000000001" name="section" outputVar="" disabled="false"><arg name="label" value="outputCounts"/><arg name="suppressTrace" value="true"/><arg name="do"><action id="00000006-0000-0000-0000-000000000002" name="log" outputVar="" disabled="false"><arg name="message" value="&quot;Counts -- processed: &quot; + counts.processed + &quot; | add: &quot; + counts.add + &quot; | update: &quot; + counts.update + &quot; | skip: &quot; + counts.skip + &quot; | error: &quot; + counts.error"/><arg name="level" value="&quot;INFO&quot;"/></action></arg></action></actions></actionDef>
+<actionDef xmlns="urn:idauto.net:dss:actiondef" name="FnExampleFunction" returnsValue="true" description="Function - RI: One-sentence description."><argDefs><argDef name="session" type="object" optional="true" description="Existing directory session; opens one if omitted."/><argDef name="logOnly" type="boolean" optional="true" description="Suppress writes when true."/><argDef name="logLevel" type="enum:quiet,normal,debug" optional="true" description="Logging verbosity."/></argDefs><actions><action id="00000001-0000-0000-0000-000000000001" name="section" outputVar="" disabled="false"><arg name="label" value="about"/><arg name="suppressTrace" value="true"/><arg name="do"><action id="00000001-0000-0000-0000-000000000002" name="comment" outputVar="" disabled="false"><arg name="comment" value="Last Modified By: "/></action><action id="00000001-0000-0000-0000-000000000003" name="comment" outputVar="" disabled="false"><arg name="comment" value="Last Modified Date: YYYY-MM-DD"/></action><action id="00000001-0000-0000-0000-000000000004" name="comment" outputVar="" disabled="false"><arg name="comment" value="Purpose:"/></action><action id="00000001-0000-0000-0000-00000000000A" name="comment" outputVar="" disabled="false"><arg name="comment" value="  One-paragraph logical overview: what it does, inputs, outputs, key branches."/></action><action id="00000001-0000-0000-0000-00000000000B" name="comment" outputVar="" disabled="false"><arg name="comment" value="Overview (pseudo-code):"/></action><action id="00000001-0000-0000-0000-00000000000C" name="comment" outputVar="" disabled="false"><arg name="comment" value="  describe the flow in plain words, indented for nesting"/></action><action id="00000001-0000-0000-0000-000000000005" name="comment" outputVar="" disabled="false"><arg name="comment" value="Parameters:"/></action><action id="00000001-0000-0000-0000-000000000006" name="comment" outputVar="" disabled="false"><arg name="comment" value="  session [optional]: Existing directory session."/></action><action id="00000001-0000-0000-0000-000000000007" name="comment" outputVar="" disabled="false"><arg name="comment" value="  logOnly [optional]: Suppress writes when true."/></action><action id="00000001-0000-0000-0000-000000000008" name="comment" outputVar="" disabled="false"><arg name="comment" value="  logLevel [optional]: quiet | normal | debug."/></action><action id="00000001-0000-0000-0000-000000000009" name="comment" outputVar="" disabled="false"><arg name="comment" value="================== Change Log =================="/></action><action id="00000001-0000-0000-0000-000000000010" name="comment" outputVar="" disabled="false"><arg name="comment" value="YYYY-MM-DD (Name): Initial version."/></action></arg></action><action id="00000002-0000-0000-0000-000000000001" name="section" outputVar="" disabled="false"><arg name="label" value="defineDefaultVariables"/><arg name="suppressTrace" value="true"/><arg name="do"><action id="00000002-0000-0000-0000-000000000002" name="setVariable" outputVar="" disabled="false"><arg name="name" value="process"/><arg name="value" value="{actionSetName:getCurrentActionSetName(),processID:getProcessID(),processJobName:getProcessJobName()||getProcessTopLevelActionSetName(),processLogFile:getProcessLogFile(),processProject:getProcessProject() == &quot;&quot; ? &quot;Main&quot; : getProcessProject(),processStartTime:formatDate(getProcessStartTime(),&quot;yyyy-MM-dd HH:mm:ss&quot;,Global.localTimeZone),runningIDHub:runningIDHub()}"/></action><action id="00000002-0000-0000-0000-000000000003" name="setVariable" outputVar="" disabled="false"><arg name="name" value="logLevel"/><arg name="value" value="logLevel || &quot;quiet&quot;"/></action><action id="00000002-0000-0000-0000-000000000004" name="setVariable" outputVar="" disabled="false"><arg name="name" value="logColors"/><arg name="value" value="Object.assign({changedData:&quot;chocolate&quot;,complete:&quot;teal&quot;,counts:&quot;black&quot;,data:&quot;blue&quot;,debug:&quot;purple&quot;,error:&quot;red&quot;,fail:&quot;darkred&quot;,info:&quot;royalBlue&quot;,logOnly:&quot;slateGray&quot;,processing:&quot;steelBlue&quot;,query:&quot;darkcyan&quot;,skipped:&quot;mediumpurple&quot;,sourceData:&quot;dimGray&quot;,success:&quot;green&quot;,targetData:&quot;darkslategray&quot;,test:&quot;darkorange&quot;,warn:&quot;goldenrod&quot;,whitespace:&quot;white&quot;},Global.connectLogColorSchema||{})"/></action><action id="00000002-0000-0000-0000-000000000005" name="setVariable" outputVar="" disabled="false"><arg name="name" value="counts"/><arg name="value" value="{processed:0,add:0,update:0,skip:0,error:0}"/></action></arg></action><action id="00000003-0000-0000-0000-000000000001" name="section" outputVar="" disabled="false"><arg name="label" value="establishConnections"/><arg name="suppressTrace" value="true"/><arg name="do"><action id="00000003-0000-0000-0000-000000000002" name="comment" outputVar="" disabled="false"><arg name="comment" value="Function mode: use provided session or open one."/></action></arg></action><action id="00000004-0000-0000-0000-000000000001" name="section" outputVar="" disabled="false"><arg name="label" value="mainLogic"/><arg name="suppressTrace" value="true"/><arg name="do"><action id="00000004-0000-0000-0000-000000000002" name="comment" outputVar="" disabled="false"><arg name="comment" value="Core logic here."/></action></arg></action><action id="00000005-0000-0000-0000-000000000001" name="section" outputVar="" disabled="false"><arg name="label" value="closeConnections"/><arg name="suppressTrace" value="true"/><arg name="do"><action id="00000005-0000-0000-0000-000000000002" name="comment" outputVar="" disabled="false"><arg name="comment" value="Close only if we opened (check closeSession flag)."/></action></arg></action><action id="00000006-0000-0000-0000-000000000001" name="section" outputVar="" disabled="false"><arg name="label" value="outputCounts"/><arg name="suppressTrace" value="true"/><arg name="do"><action id="00000006-0000-0000-0000-000000000002" name="log" outputVar="" disabled="false"><arg name="message" value="&quot;Counts -- processed: &quot; + counts.processed + &quot; | add: &quot; + counts.add + &quot; | update: &quot; + counts.update + &quot; | skip: &quot; + counts.skip + &quot; | error: &quot; + counts.error"/><arg name="level" value="&quot;INFO&quot;"/></action></arg></action></actions></actionDef>
 ```
 
 ### Scheduled Job (Manage/Sync)
@@ -1482,14 +1482,14 @@ Before delivering any XML:
 | Pitfall | Fix |
 |---|---|
 | Section label `return` | Rename to `returnSuccess`, `returnRecord`, etc. |
-| `&quot;quoted&quot;` value on `section`/`forEach`/`while`/`continue`/`break`'s `label` arg | Write the bare identifier — `label` is `type="name"` on these, not an expression. The validator does not catch this (it exempts `label` from expression checking), so it passes clean while the label literally contains quote characters. `caFnCoreLog`'s `label` is the one exception — that one IS `type="string"` and does get quoted. See § Section Labels |
+| `&quot;quoted&quot;` value on `section`/`forEach`/`while`/`continue`/`break`'s `label` arg | Write the bare identifier — `label` is `type="name"` on these, not an expression. The validator does not catch this (it exempts `label` from expression checking), so it passes clean while the label literally contains quote characters. `caFnLog`'s `label` is the one exception — that one IS `type="string"` and does get quoted. See § Section Labels |
 | Hardcoded base DNs or hostnames | Use `Global.*` references |
 | `SharedGlobal.` prefix in an action set | Reference every global as `Global.variableName` — `SharedGlobal.` is never used in action set expressions |
 | `builtIn="false"` on user action set | Remove the attribute entirely |
 | `record['idautoID']` bracket notation | Change to `record.idautoID` — brackets only for `@` or `-` keys |
 | Individual counter variables (`addCount`, `updateCount`) | Use a single `counts` object |
 | Opening a connection inside a function when a session was passed | Check `!session` first |
-| Using generic `openConnection` for AD, RI, Google, Portal | Non-CA: use `FnCoreOpenConnections`; CA: use the typed built-in — see `references/connections.md` |
+| Using generic `openConnection` for AD, RI, Google, Portal | Non-CA: use `FnOpenConns`; CA: use the typed built-in — see `references/connections.md` |
 | XML written with pretty-print indentation | Flatten to single-line compact output |
 | Bare `{...}` or `[...]` literal in `setVariable value=` | Fails the JS compiler — seed with the `createRecord` / `createArray` actions; see § Records & arrays - construction and `references/native-action-cheatsheet.md` |
 | `parseJSON('{}')` / `parseJSON('[]')` to seed an empty container | Never do this — `parseJSON` parses JSON *strings*. Use `createRecord` (object) / `createArray` (array). See § Records & arrays - construction |
@@ -1498,7 +1498,7 @@ Before delivering any XML:
 | Bare `&&`, `<`, or `>` in a `value=` expression | Escape as `&amp;&amp;`, `&lt;`, `&gt;` — bare metacharacters make the XML ill-formed before the JS compiler runs |
 | `setVariable` to copy a Record or extract from results array | Use `copyRecord` — `setVariable` aliases, not copies; mutation on one affects both. Applies to snapshots, `results[0]` extraction, and loop guards |
 | `setVariable` to copy an array before removing items in a loop | Use `copyArray` — same alias problem; mutating the array being iterated breaks `forEach` |
-| `FnHasRecordChanged` returns false when changes were made | Both args point to the same object due to `setVariable` aliasing — `copyRecord` for the snapshot before mutation |
+| `FnHasChanged` returns false when changes were made | Both args point to the same object due to `setVariable` aliasing — `copyRecord` for the snapshot before mutation |
 | `<action>` missing `id` or `disabled` | Actions render read-only in Connect editor — every action needs `id="UPPERCASE-UUID"` and `disabled="false"` |
 | `forEach` with `item` / `items` args | Wrong arg names — use `variable` (loop var name) and `collection` (the array) |
 | `getLDAPRecords` with `attributes` value `[]` | Bare array literal fails the expression compiler — use `"*,+"`, `"*"`, or `"attr1,attr2"` |

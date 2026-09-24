@@ -33,7 +33,7 @@ Note the project-qualified `actionName` and the `dssUrl`/`username`/`trace` fiel
   "dssUrl": "",
   "username": "",
   "trace": true,
-  "actionName": "sandbox.WFMCreateSponsoredAccount",
+  "actionName": "sandbox.WFMValidateAccount",
   "valuePairs": [
     "givenname='%{form.givenname}'",
     "sn='%{form.sn}'",

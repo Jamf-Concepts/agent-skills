@@ -173,7 +173,7 @@ into `%{dss.*}` variables.
   "type": "advancedDssAction",
   "id": "<uuid>",
   "name": "Create/Update Account",
-  "actionName": "WFMCreateSponsoredAccount",
+  "actionName": "WFMValidateAccount",
   "nextActionId": "<uuid>",
   "valuePairs": [
     "givenname='%{form.givenname}'",

@@ -10,14 +10,14 @@ Typed connection actions for each target system. Always store the result in `out
 ---
 
 
-## FnCoreOpenConnections — canonical connection helper (non-CA sets)
+## FnOpenConns — canonical connection helper (non-CA sets)
 
-For non-Community-Adapter action sets, use `FnCoreOpenConnections` instead of per-system inline connection blocks. It lives in `ref_ConnectLibrary` and opens one or more connections in a single call.
+For non-Community-Adapter action sets, use `FnOpenConns` instead of per-system inline connection blocks. It lives in `ref_SharedLibrary` and opens one or more connections in a single call.
 
 **Contract:** `targetSystem` is a Global prefix or comma-delimited list (`ad`, `google`, `microsoft`, `exchange`, `db`, `file`, `oneRoster`, `Portal`, `RapidIdentity`, `httpBasic`, `bearer`, `oauth2`). Each prefix resolves to a connection type via `Global.{prefix}ConnectionType`, with credentials read from SharedGlobals. Optional `existingSession` is validated/reused (single targetSystem only). Returns a `conns` record keyed by prefix, each entry holding `session`, `properties`, and `process`.
 
 ```xml
-<action name="FnCoreOpenConnections" outputVar="conns" project="ref_ConnectLibrary">
+<action name="FnOpenConns" outputVar="conns" project="ref_SharedLibrary">
   <arg name="targetSystem" value="&quot;ad&quot;"/>
 </action>
 <action name="if">
@@ -50,7 +50,7 @@ Multiple systems at once: `targetSystem="&quot;ad,google,microsoft&quot;"` — `
 | `RapidIdentity` | `Global.RapidIdentityConnectionType` | (internal) |
 | `db` | `Global.dbConnectionType` | `Global.dbUser`, `Global.dbPwd`, `Global.dbConnStringTemplate`, `Global.dbName`, `Global.dbDriverClass` |
 
-**CA constraint:** Community Adapter sets MUST NOT call `FnCoreOpenConnections` — it lives in a different project. CA sets use built-in connection actions directly (see sections below).
+**CA constraint:** Community Adapter sets MUST NOT call `FnOpenConns` — it lives in a different project. CA sets use built-in connection actions directly (see sections below).
 
 ---
 

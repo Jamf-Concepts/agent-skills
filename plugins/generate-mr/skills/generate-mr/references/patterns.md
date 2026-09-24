@@ -255,12 +255,12 @@ let @ou = when {
     (idautoDisabled == "TRUE" && employeeType.contains("staff")) -> "OU=StaffDisabledAccounts,DC=meta,DC=local"
     (idautoDisabled == "TRUE")                                   -> "OU=StudentDisabledAccounts,DC=meta,DC=local"
     // Staff by school
-    (employeeType.contains("staff") && idautoPersonSchoolNames.contains("Branford High School")) -> "OU=Staff,OU=BHS,DC=meta,DC=local"
-    (employeeType.contains("staff") && idautoPersonSchoolNames.contains("Branford Middle School")) -> "OU=Staff,OU=BMS,DC=meta,DC=local"
+    (employeeType.contains("staff") && idautoPersonSchoolNames.contains("Example High School")) -> "OU=Staff,OU=BHS,DC=meta,DC=local"
+    (employeeType.contains("staff") && idautoPersonSchoolNames.contains("Example Middle School")) -> "OU=Staff,OU=BMS,DC=meta,DC=local"
     // Students by school + graduation year
-    ((employeeType.contains("student") && idautoPersonSchoolNames.contains("Branford High School")) && (idautoPersonDeptDescr == "Class of 2026")) -> "OU=Class of 2026,OU=Students,OU=BHS,DC=meta,DC=local"
-    (employeeType.contains("student") && idautoPersonSchoolNames.contains("Branford High School")) -> "OU=Students,OU=BHS,DC=meta,DC=local"
-    (employeeType.contains("student") && idautoPersonSchoolNames.contains("Branford Middle School")) -> "OU=Students,OU=BMS,DC=meta,DC=local"
+    ((employeeType.contains("student") && idautoPersonSchoolNames.contains("Example High School")) && (idautoPersonDeptDescr == "Class of 2026")) -> "OU=Class of 2026,OU=Students,OU=BHS,DC=meta,DC=local"
+    (employeeType.contains("student") && idautoPersonSchoolNames.contains("Example High School")) -> "OU=Students,OU=BHS,DC=meta,DC=local"
+    (employeeType.contains("student") && idautoPersonSchoolNames.contains("Example Middle School")) -> "OU=Students,OU=BMS,DC=meta,DC=local"
     // Fallbacks
     employeeType.contains("student") -> "OU=Outplaced,DC=meta,DC=local"
     else                             -> "OU=RapidIDDefaultUser,DC=meta,DC=local"

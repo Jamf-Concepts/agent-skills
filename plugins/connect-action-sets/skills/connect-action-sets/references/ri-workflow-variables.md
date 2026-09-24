@@ -37,7 +37,7 @@
 ```
 
 - `dssUrl: ""` — Empty string means the local Connect instance.
-- `actionName` — Format is `projectName.ActionSetName` (e.g. `"WFMCreateSponsoredAccount"` for `<Main>` project).
+- `actionName` — Format is `projectName.ActionSetName` (e.g. `"WFMValidateAccount"` for `<Main>` project).
 - `trace: true` — Enable Connect trace logging for this action call.
 
 ---

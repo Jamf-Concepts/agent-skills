@@ -21,7 +21,7 @@ action set. It is the Connect equivalent of a user clicking "Request" in the por
 
 | Arg | Type | Required | Notes |
 |---|---|---|---|
-| `connection` | portal session | Yes | Session from `defineCloudPortalConnection` or `FnOpenConnections` with `target="Portal"` |
+| `connection` | portal session | Yes | Session from `defineCloudPortalConnection` or `FnOpenConn` with `target="Portal"` |
 | `type` | string | Yes | Request type — `"GRANT"` is the standard value for entitlement/access requests |
 | `recipientId` | string | Yes | The `idautoID` of the person who will receive the entitlement (the subject) |
 | `entitlementId` | string | Yes | UUID of the WFM resource/entitlement to request — **hardcoded per workflow** (see note below) |
@@ -44,7 +44,7 @@ action set. It is the Connect equivalent of a user clicking "Request" in the por
 ## Required session
 
 `startPortalWorkflow` requires a **portal session** (not an LDAP session). Obtain via
-`defineCloudPortalConnection` (manifest pattern) or via a project-local `FnOpenConnections`
+`defineCloudPortalConnection` (manifest pattern) or via a project-local `FnOpenConn`
 with `target="Portal"`.
 
 The LDAP metadirectory session (`sessionRI`) is used only to resolve LDAP attributes needed

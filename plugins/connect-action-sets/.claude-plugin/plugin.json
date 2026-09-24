@@ -1,6 +1,6 @@
 {
   "name": "connect-action-sets",
-  "version": "v1.5.0",
+  "version": "v1.5.1",
   "description": "A comprehensive guide for authoring, reviewing, and refactoring RapidIdentity Connect action sets in XML. Covers conventions, coding standards, logging patterns, JavaScript semantics, and platform best practices for building identity workflows.",
   "author": {
     "name": "Jesse Hall",
