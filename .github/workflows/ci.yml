@@ -25,5 +25,5 @@ jobs:
       - name: Python lint
         if: hashFiles('plugins/**/*.py') != ''
         run: |
-          pip install ruff==0.16.7 --quiet
+          pip install ruff==0.16.7 --quiet --only-binary :all:
           ruff check plugins/
