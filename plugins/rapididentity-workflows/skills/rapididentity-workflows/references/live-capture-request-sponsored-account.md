@@ -1,6 +1,6 @@
 # Live capture — "Request Sponsored Account" (sandbox tenant)
 
-Captured 2026-07-28 via `GET /api/rest/admin/workflow/workflowDefinitions/176f6c88-3393-4d89-9540-c95bf922336b`
+Captured 2026-07-28 via `GET /api/rest/admin/workflow/workflowDefinitions/00000000-0000-4000-a000-000000000001`
 (sandbox tenant, definition version 4). This is the
 ground truth for field names in this skill — when a doc and this capture disagree, this capture
 wins. HTML email bodies are elided (`...`) for size; every field name and structure is verbatim.
@@ -9,8 +9,8 @@ wins. HTML email bodies are elided (`...`) for size; every field name and struct
 
 ```json
 {
-  "id": "176f6c88-3393-4d89-9540-c95bf922336b",
-  "dn": "CN=176f6c88-3393-4d89-9540-c95bf922336b,OU=workflows",
+  "id": "00000000-0000-4000-a000-000000000001",
+  "dn": "CN=00000000-0000-4000-a000-000000000001,OU=workflows",
   "version": 4,
   "name": "Request Sponsored Account",
   "description": "Request a Sponsored account with approval from Portal Sponsor users.",
@@ -27,7 +27,7 @@ Note the project-qualified `actionName` and the `dssUrl`/`username`/`trace` fiel
 ```json
 {
   "type": "advancedDssAction",
-  "id": "96605ef5-7b46-484b-8d5b-821aff00a946",
+  "id": "00000000-0000-4000-a000-000000000002",
   "name": "Validate Account",
   "description": "Ensure account is valid to be created",
   "dssUrl": "",
@@ -43,7 +43,7 @@ Note the project-qualified `actionName` and the `dssUrl`/`username`/`trace` fiel
     "validateOnly='true'",
     "approvercomments='%{approval0.comments}'"
   ],
-  "nextActionId": "1b394b7e-e36a-447d-8393-5c8f676d5933"
+  "nextActionId": "00000000-0000-4000-a000-000000000003"
 }
 ```
 
@@ -52,13 +52,13 @@ Note the project-qualified `actionName` and the `dssUrl`/`username`/`trace` fiel
 ```json
 {
   "type": "conditionAction",
-  "id": "1b394b7e-e36a-447d-8393-5c8f676d5933",
+  "id": "00000000-0000-4000-a000-000000000003",
   "name": "If Valid Account",
   "operand1": "%{dss.success}",
   "operation": "MATCHES_ANY_REGEX",
   "operand2": "true",
-  "onTrueActionId": "ef501e2d-e2e3-4255-ad6c-c9be46ba72ba",
-  "onFalseActionId": "41510ea2-5660-4502-84ac-f2d989cf18fa"
+  "onTrueActionId": "00000000-0000-4000-a000-000000000004",
+  "onFalseActionId": "00000000-0000-4000-a000-000000000005"
 }
 ```
 
@@ -69,7 +69,7 @@ Note the project-qualified `actionName` and the `dssUrl`/`username`/`trace` fiel
 ```json
 {
   "type": "emailAction",
-  "id": "99eb7874-0dc4-49da-b4e7-104da3e223c7",
+  "id": "00000000-0000-4000-a000-000000000006",
   "name": "Send Welcome Email",
   "description": "Send a welcome email to the new user using the idautopersonhomeemail value",
   "from": "noreply@rapididentity.com",
@@ -87,21 +87,21 @@ Note the project-qualified `actionName` and the `dssUrl`/`username`/`trace` fiel
 ```json
 {
   "type": "approvalAction",
-  "id": "ef501e2d-e2e3-4255-ad6c-c9be46ba72ba",
+  "id": "00000000-0000-4000-a000-000000000004",
   "name": "Approval",
   "description": "Creates approval request for department head of the workflow requestor.",
   "approver": {
     "type": "groupApprover",
     "group": {
-      "id": "875e4248-0aea-4f09-8197-363f47735837",
-      "dn": "idautoID=875e4248-0aea-4f09-8197-363f47735837,ou=Groups,dc=meta",
+      "id": "00000000-0000-4000-a000-000000000007",
+      "dn": "idautoID=00000000-0000-4000-a000-000000000007,ou=Groups,dc=meta",
       "name": "Portal Sponsor"
     }
   },
   "expirationDays": -1,
   "escalationDays": -1,
-  "onApproveId": "0821098e-5fed-4b8a-b647-7f04eb8bc266",
-  "onDenyId": "c55c6392-1188-4856-93a8-838bd873cd5c"
+  "onApproveId": "00000000-0000-4000-a000-000000000008",
+  "onDenyId": "00000000-0000-4000-a000-000000000009"
 }
 ```
 
@@ -114,7 +114,7 @@ approval action's id; optional fields use `editableActionIds` instead; `LIST` it
 ```json
 "forms": [
   {
-    "id": "bd3e7470-52c7-4f7e-9bf9-9248098fdeab",
+    "id": "00000000-0000-4000-a000-00000000000a",
     "displayName": "Request Sponsored Account",
     "workflowFormItems": [
       {
@@ -123,7 +123,7 @@ approval action's id; optional fields use `editableActionIds` instead; `LIST` it
         "type": "STRING",
         "hideFromRecipient": false,
         "listElements": [],
-        "requiredActionIds": ["start", "ef501e2d-e2e3-4255-ad6c-c9be46ba72ba"],
+        "requiredActionIds": ["start", "00000000-0000-4000-a000-000000000004"],
         "editableActionIds": [],
         "hiddenActionIds": []
       },
@@ -140,7 +140,7 @@ approval action's id; optional fields use `editableActionIds` instead; `LIST` it
           { "displayValue": "Vendor", "value": "Vendor" },
           { "displayValue": "Other", "value": "Other" }
         ],
-        "requiredActionIds": ["start", "ef501e2d-e2e3-4255-ad6c-c9be46ba72ba"],
+        "requiredActionIds": ["start", "00000000-0000-4000-a000-000000000004"],
         "editableActionIds": [],
         "hiddenActionIds": []
       }

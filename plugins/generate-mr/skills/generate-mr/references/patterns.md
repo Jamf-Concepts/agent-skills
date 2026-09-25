@@ -4,7 +4,7 @@
 
 ### OneRoster Ingestion
 ```
-ruleID = ed917774-05d6-440f-b07f-7b7808e7aa24
+ruleID = a1b2c3d4-0000-0000-0000-000000000101
 ruleType = person
 
 // Ingestion: OneRoster → ID Store
@@ -39,7 +39,7 @@ let idautoPersonSchoolCodes = orgs.mapWithSelector("sourcedId")
 
 ### PowerSchool SIS Ingestion
 ```
-ruleID = c0ded644-523e-461b-96ee-c3eac31d633b
+ruleID = a1b2c3d4-0000-0000-0000-000000000102
 ruleType = person
 
 // Ingestion: PowerSchool SIS → ID Store
@@ -101,7 +101,7 @@ let idautoDisabled = if (WorkerStatus != "Active") "TRUE" else "FALSE"
 
 ### Student Username (first initial + last name, collision-safe)
 ```
-ruleID = bf696a54-09f7-11ed-bf51-930af7686f25
+ruleID = a1b2c3d4-0000-0000-0000-000000000103
 ruleType = person
 
 // Policy: student username and password generation.
@@ -121,7 +121,7 @@ let idautoPersonClaimCode = randomNumber(4)
 
 ### Staff Username (first.last, no collision handling)
 ```
-ruleID = ef696a54-09f7-11ed-bf51-930af7686f25
+ruleID = a1b2c3d4-0000-0000-0000-000000000104
 ruleType = person
 
 // Policy: staff username.
@@ -131,7 +131,7 @@ let idautoPersonUserNameMV = givenName.stripDiacriticals().stripSpecialCharacter
 
 ### Grade-Based Password Policy
 ```
-ruleID = 524650b4-328d-4e24-937b-6eb513f734c8
+ruleID = a1b2c3d4-0000-0000-0000-000000000105
 ruleType = person
 
 // Policy: password strength by grade level.
@@ -147,7 +147,7 @@ let idautoPersonClaimCode = randomNumber(4)
 
 ### Sponsored Account Username
 ```
-ruleID = a3e010ba-2fef-11ef-8bfe-2f6e626b9ac5
+ruleID = a1b2c3d4-0000-0000-0000-000000000106
 ruleType = person
 
 // Policy: sponsored/contractor account username (first initial + last, max 24 chars).
@@ -194,7 +194,7 @@ let @deactivationOffset = when {
 ```
 // Specific tenant (identified by idautoID prefix) gets delayed activation.
 let @activationOffset = when {
-    idautoID.startsWith("0b9d513d") -> 86400
+    idautoID.startsWith("00000000") -> 86400
     else -> -1
 }
 ```

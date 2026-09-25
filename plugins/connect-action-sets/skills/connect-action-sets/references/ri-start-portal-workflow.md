@@ -12,7 +12,7 @@ action set. It is the Connect equivalent of a user clicking "Request" in the por
   <arg name="connection"   value="sessionPortal"/>
   <arg name="type"         value="&quot;GRANT&quot;"/>
   <arg name="recipientId"  value="someUser.idautoID"/>
-  <arg name="entitlementId" value="&quot;424c2500-c58e-4d2e-be0f-15c5ed3e1b7b&quot;"/>
+  <arg name="entitlementId" value="&quot;a1b2c3d4-0000-0000-0000-000000000200&quot;"/>
   <arg name="formData"     value="formRecord"/>
 </action>
 ```
@@ -70,7 +70,7 @@ always parameterize it via a Global variable rather than hardcoding in the actio
 match the workflow form field names. Use `filterRecordFields` to strip fields the form does not
 expect, and `renameRecordFields` if the LDAP attribute name differs from the form field name.
 
-Pattern from `AltAction_CertifySponsored`:
+Pattern from `AltActionExampleCertify`:
 
 ```xml
 <!-- 1. Build the record (copy from an existing record or create fresh) -->
@@ -174,7 +174,7 @@ use `startTask` when proxying a browser-initiated request through the RESTPoint 
 
 ## Source
 
-Confirmed from `AltAction_CertifySponsored.xml` (Alternate Action — certifies a sponsored
+Confirmed from `AltActionExampleCertify.xml` (Alternate Action — certifies a sponsored
 account by submitting a GRANT request to a specific WFM entitlement). The `entitlementId`
-`424c2500-c58e-4d2e-be0f-15c5ed3e1b7b` in that file is tenant-specific and should not be
+`a1b2c3d4-0000-0000-0000-000000000200` in that file is tenant-specific and should not be
 reused; always resolve via a Global variable.
