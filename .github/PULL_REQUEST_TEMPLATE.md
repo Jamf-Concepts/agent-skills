@@ -7,4 +7,4 @@
 - [ ] Tested locally
 - [ ] No secrets or credentials committed
 - [ ] Relevant docs / README updated
-- [ ] Targets the `develop` branch (not `main`)
+- [ ] Targets upstream `main` from a fork or local branch (do not commit directly to `main`)

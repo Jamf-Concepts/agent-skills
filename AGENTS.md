@@ -5,7 +5,7 @@ Takes precedence over `README.md`, `CLAUDE.md`, and similar instruction files.
 Claude Code loads this file through the one-line `@AGENTS.md` reference in `CLAUDE.md`.
 
 ## Orchestration Contract
-This file codifies project rules, boundaries, workflows, and repeatable skills. If same correction repeats, formalize it here instead of re-prompting it.
+This file codifies project rules, boundaries, workflows, and repeatable skills. If the same correction repeats, formalize it here instead of re-prompting it.
 
 ## Project Overview
 Jamf Platform agent skills. Each skill is a focused body of knowledge about one Jamf product area — its APIs, file formats, conventions, and mistakes worth avoiding. Upstream: `Jamf-Concepts/agent-skills`.
@@ -53,7 +53,7 @@ Invoke relevant skill name during planning.
 1. Classify change with the skill's own semver rules (see its `README.md` → Versioning). For `jamf-platform-api-migration`: patch = bundled data refresh or wording; minor = conversion rule added or changed; major = report structure changed.
 2. Bump `metadata.version` in `SKILL.md` frontmatter.
 3. Sync every hardcoded copy of the version: `SKILL.md` Output contract examples, README version badge, README Versioning section.
-4. When bundled data is refreshed, update its date everywhere it appears (frontmatter `metadata.bundled-permissions-map`, `capability-grants.md`, README badge and audit notes; `conversion-rules.md` known-version table date).
+4. When bundled permissions-map data is refreshed, update its date everywhere that permissions-map date appears: frontmatter `metadata.bundled-permissions-map`, `capability-grants.md`, README badge, README Versioning section, and README audit notes. Update the `conversion-rules.md` known-version table date only when that table is independently re-verified.
 5. Add a changelog entry in the skill's `README.md` with date.
 
 ## Boundaries
@@ -103,13 +103,13 @@ Out of scope:
 2. Portability: skill directories run unchanged on every Agent Skills surface.
 3. Deterministic output: two runs of one request produce the same files and names.
 4. Safety: skills never reproduce secrets, never modify user originals, never run user scripts.
-5. Docs, versions, and dates stay synchronized across `SKILL.md`, reference files, and READMEs.
+5. Repeated copies of the same version or date value stay synchronized across `SKILL.md`, reference files, and READMEs.
 
 ## Key Files
 - `README.md`: catalog (Available Skills table), packaging comparison, install, troubleshooting
 - `skills/jamf-platform-api-migration/`: only shipped skill (v1.0.0). `SKILL.md` = procedure + output contract; `conversion-rules.md`, `capability-grants.md`, `protect-graphql.md`, `runtime-behavior.md`, `examples.md` = references; `README.md` = humans only
 - `.github/workflows/ci.yml`: JSON validation + conditional ruff on PRs to `main`
-- `.github/PULL_REQUEST_TEMPLATE.md`: PR checklist (tested, no secrets, docs updated, targets `develop`)
+- `.github/PULL_REQUEST_TEMPLATE.md`: PR checklist (tested, no secrets, docs updated, branch-target reminder)
 - `.github/CODEOWNERS`: `@Jamf-Concepts/jamf-concepts-write` owns everything
 - `ruff.toml`, `.gitignore`, `SECURITY.md`, `LICENSE.md` (MIT, Jamf Software, LLC)
 
@@ -120,8 +120,8 @@ Out of scope:
 - No `plugins/` directory and no `.claude-plugin/marketplace.json` yet; CI's ruff step is skipped until plugin Python lands.
 
 ## Repository Rules
-- Branch flow: `develop` → `main` via PR. Never commit directly to `main`. All changes go through a PR — even small fixes.
-- `origin` may be a personal fork; upstream is `Jamf-Concepts/agent-skills`. Know which one you are pushing to.
+- Branch flow for this repository today: work on `develop` in a fork or local branch, then open a PR to upstream `main`. Upstream `Jamf-Concepts/agent-skills` does not currently have a `develop` branch. Never commit directly to `main`. All changes go through a PR — even small fixes.
+- `origin` may be a personal fork; upstream is `Jamf-Concepts/agent-skills`. Know which remote and branch you are pushing to.
 - Adding a skill or plugin means updating the Available Skills table in root `README.md` in the same PR.
 - Prefer minimal targeted edits over broad rewrites. Avoid hidden behavior changes.
 - If a skill's behavior changes, bump its version and add a changelog entry.
@@ -143,7 +143,7 @@ Match existing `jamf-platform-api-migration` voice unless user explicitly asks o
 2. Plugin Python passes `ruff check plugins/`.
 3. `SKILL.md` frontmatter parses as YAML and `name` matches directory name.
 4. Relative links in touched Markdown resolve.
-5. Version and date strings agree across `SKILL.md`, reference files, and README.
+5. Repeated copies of the same version or date string agree across `SKILL.md`, reference files, and README.
 6. Root `README.md` Available Skills table matches `skills/` and `plugins/`.
 7. For `AGENTS.md`-only changes, review rendered Markdown and cross-file consistency.
 
@@ -151,9 +151,9 @@ Match existing `jamf-platform-api-migration` voice unless user explicitly asks o
 Apply only for release prep.
 1. Version bumped per the skill's semver rules; every hardcoded copy synced.
 2. Changelog entry dated and matching shipped behavior.
-3. Bundled-data dates refreshed where data was refreshed.
+3. Bundled permissions-map date and any other independently verified data dates refreshed where that data was refreshed.
 4. Root `README.md` table current.
-5. PR from `develop` to `main`; CI green.
+5. PR from fork/local `develop` to upstream `main`; CI green.
 
 ## Maintenance
 This file is versioned with project. When structure, boundaries, or validation requirements change, update `AGENTS.md` in the same PR. Keep file near 200 lines for agent attention.
